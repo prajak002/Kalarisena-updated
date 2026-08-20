@@ -1,0 +1,59 @@
+# --- environments / caches ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.claude/
+
+# --- the archived pre-existing repo ---
+.git_ARCHIVED_*/
+
+# --- large generated data (GB-scale; regenerate, do not version) ---
+data/
+cloud_outputs/
+outputs/
+models/
+results_review/
+results_sequences/
+results_sim/
+results_paper/
+results_demo/
+export_cycles/
+export_cycles30/
+export_full900/
+export_mini900/
+export_local/
+web/
+kalarisena-review/
+kalari_gallery/
+_box_backup_20260819/
+arena_v9_validation/
+look/
+frames*/
+qv*/
+
+# --- 3D assets and binaries pulled from elsewhere ---
+assets/
+*.glb
+*.gltf
+*.bin
+*.blend
+*.blend1
+*.npz
+*.pt
+*.stl
+
+# --- external repos pulled by the installer ---
+GEM-X/
+unitree_rl_mjlab/
+
+# --- media / logs / secrets ---
+*.mp4
+*.bvh
+*.log
+MUJOCO_LOG.TXT
+*.pem
+*.key
+.env
+.env.*
