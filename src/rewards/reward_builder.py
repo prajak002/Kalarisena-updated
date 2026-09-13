@@ -49,6 +49,23 @@ def _time_to_upright(step: int, lam: float = 0.01) -> float:
     return -lam * float(step)
 
 
+def _upright_shaping(upright: float, W: float = 1.0) -> float:
+    """Dense signal proportional to torso-upright cosine (in [-1, 1]), so
+    the policy gets gradient everywhere instead of only past the
+    recovery_success threshold. Without this, recovery_success + a flat
+    per-step time penalty give zero learning signal to any pose that
+    hasn't already reached the upright threshold - which a randomly
+    fallen pose almost never does by chance."""
+    return W * float(upright)
+
+
+def _height_shaping(base_height: float, target: float = 1.0, lam: float = 1.0) -> float:
+    """Dense signal rewarding torso height climbing back toward the
+    standing target, same shape as _com_support_margin/_capture_point_margin
+    (squared shortfall, zero once at or above target)."""
+    return -lam * max(0.0, float(target) - float(base_height)) ** 2
+
+
 class RewardBuilder:
     """Stateless reward computation. Returns (total, breakdown)."""
 
@@ -109,6 +126,16 @@ class RewardBuilder:
             elif term_name == "time_to_upright":
                 cfg = term_cfg if isinstance(term_cfg, dict) else {"lam": float(term_cfg)}
                 value = _time_to_upright(kwargs["step"], lam=float(cfg.get("lam", 0.01)))
+            elif term_name == "upright_shaping":
+                cfg = term_cfg if isinstance(term_cfg, dict) else {"W": float(term_cfg)}
+                value = _upright_shaping(kwargs["upright"], W=float(cfg.get("W", 1.0)))
+            elif term_name == "height_shaping":
+                cfg = term_cfg if isinstance(term_cfg, dict) else {}
+                value = _height_shaping(
+                    kwargs["base_height"],
+                    target=float(cfg.get("target", 1.0)),
+                    lam=float(cfg.get("lam", 1.0)),
+                )
             else:
                 raise KeyError(f"Unknown reward term: {term_name}")
 

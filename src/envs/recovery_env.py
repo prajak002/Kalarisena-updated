@@ -109,7 +109,9 @@ class RecoveryEnv(gym.Env):
         terminated = bool(success)
         truncated = bool(timeout)
 
-        reward, breakdown = self.reward_builder.compute(is_upright=is_upright, step=self._step)
+        reward, breakdown = self.reward_builder.compute(
+            is_upright=is_upright, step=self._step,
+            upright=upright, base_height=float(self.rt.base_height))
 
         info = {"upright": float(upright), "is_upright": bool(is_upright),
                  "success": bool(success), "step": self._step,

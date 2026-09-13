@@ -39,6 +39,10 @@ class PerturbedTrackEnv(KalariTrackEnv):
     def set_perturbation(self, pert: Perturbation) -> None:
         self._pert = pert
 
+    @property
+    def t(self) -> float:
+        return self._t
+
     def reset(self, *, seed=None, options=None):
         obs, info = super().reset(seed=seed, options=options)
         self._t = 0.0
@@ -95,6 +99,35 @@ class PerturbedTrackEnv(KalariTrackEnv):
         left_c, right_c = self._foot_contacts()
         feats = self.pin.get_support_features(q, dq, np.array([left_c, right_c]))
         return feats
+
+    def switch_features(self, step_index: int = 0) -> dict:
+        """Full feature set src/switch/mode_switch.ModeSwitch needs (same
+        quantities scripts/eval_integrated_switch.py computes ad hoc for
+        MultiMotionTrackEnv), exposed here for PerturbedTrackEnv so
+        scripts/sim_controlled_perturbation.py can drive real mode-switching
+        under a controllable push instead of only a raw tracker rollout."""
+        d = self.rt.data
+        q = np.concatenate([d.qpos[0:3], d.qpos[3:7][[1, 2, 3, 0]], d.qpos[self.rt.act_qadr]])
+        dq = np.concatenate([d.qvel[0:3], d.qvel[3:6], d.qvel[self.rt.act_vadr]])
+        feats = self.physics_features()
+        hg = self.pin.compute_centroidal_momentum(q, dq)
+        upright = self.rt.torso_upright_cos()
+        return {
+            "cp_margin": feats["cp_margin"] if feats.get("support_area", 0) > 0 else 0.0,
+            "momentum_norm": float(np.linalg.norm(hg[3:])),
+            "base_height": float(self.rt.base_height),
+            "is_fallen": bool(upright < 0.3),
+            "is_upright": bool(upright > 0.7),
+            "step_index": step_index,
+        }
+
+    def torso_force(self) -> float:
+        """Impact force on the torso geoms - same quantity Stage D trains
+        against and scripts/eval_integrated_switch.py feeds to the fall
+        policy's extra observation dims."""
+        torso_body = self.rt.mujoco.mj_name2id(self.rt.model, self.rt.mujoco.mjtObj.mjOBJ_BODY, "torso_link")
+        torso_geoms = self.rt._collision_geoms_of_body(torso_body)
+        return self.rt.geom_group_force(torso_geoms)
 
     def _foot_contacts(self, z_thresh: float = 0.05) -> tuple[bool, bool]:
         rt = self.rt

@@ -4,3 +4,9 @@ obs:
 rewards:
   recovery_success: {bonus: 10.0}
   time_to_upright: {lam: 0.01}
+  # Dense shaping added because the two terms above give literally zero
+  # learning signal to any pose below the 0.75 upright-cosine success
+  # threshold - which a randomly fallen pose reaches only by chance. This
+  # was the root cause of the 0% success rate at 2M steps.
+  upright_shaping: {W: 1.0}
+  height_shaping: {target: 1.0, lam: 0.5}
