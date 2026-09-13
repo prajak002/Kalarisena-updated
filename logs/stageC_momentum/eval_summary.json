@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "experiment_name": "stageC_momentum",
+    "stage": "C (momentum regulation)",
+    "algo": "PPO (stable-baselines3)",
+    "config": "configs/momentum.yaml",
+    "motions": [
+      "data/motions_retargeted/ks_side_kick.npz",
+      "data/motions_retargeted/kw_highkick_right.npz",
+      "data/motions_retargeted/kw_highkick_left.npz",
+      "data/motions_retargeted/ky_kick_seq.npz",
+      "data/motions_retargeted/pk_kick_lunge.npz",
+      "data/motions_retargeted/nk_squat_highkick.npz"
+    ],
+    "phase_weight": 2.0,
+    "steps": 2000000,
+    "n_envs": 8,
+    "note": "trained from scratch; see docstring re: rotational/explosive_strike mismatch"
+  },
+  "summary": {
+    "overall": {
+      "mean_hg_angular_norm": 0.7943130360936665,
+      "fall_rate": 1.0
+    },
+    "per_motion": {
+      "ks_side_kick": {
+        "mean_hg_angular_norm": 0.2196588213404936,
+        "fall_rate": 1.0
+      },
+      "kw_highkick_right": {
+        "mean_hg_angular_norm": 1.0532469890047618,
+        "fall_rate": 1.0
+      },
+      "kw_highkick_left": {
+        "mean_hg_angular_norm": 0.8477851111302307,
+        "fall_rate": 1.0
+      },
+      "ky_kick_seq": {
+        "mean_hg_angular_norm": 0.174155659538653,
+        "fall_rate": 1.0
+      },
+      "pk_kick_lunge": {
+        "mean_hg_angular_norm": 2.0007375501855793,
+        "fall_rate": 1.0
+      },
+      "nk_squat_highkick": {
+        "mean_hg_angular_norm": 0.4702940853622815,
+        "fall_rate": 1.0
+      }
+    }
+  }
+}

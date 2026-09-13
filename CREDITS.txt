@@ -1,0 +1,15 @@
+KALARISENA - a humanoid kalaripayattu corps
+
+3D assets used under Creative Commons licences. Attribution is a licence
+condition: include these credits wherever the film is published (e.g. the
+video description).
+
+  Charminar        - Shreyas (sketchfab.com/atarangtar)  - CC BY 4.0
+  Indian Flag      - pingupingu (sketchfab.com/pinpingu1) - CC BY 4.0
+  Qutub Minar      - popingo (sketchfab.com/popingo)      - CC BY 4.0
+  Gateway of India - RakeshCreates                        - CC BY-NC 4.0
+  Taj Mahal        - AtheneaAtlas                         - CC BY-NC 4.0
+
+Licences: creativecommons.org/licenses
+NOTE: the two BY-NC models (Gateway of India, Taj Mahal) do not permit
+commercial use - replace them before any commercial release.

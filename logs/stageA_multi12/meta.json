@@ -1,0 +1,24 @@
+{
+  "experiment_name": "stageA_multi12",
+  "stage": "A (multi-motion tracking)",
+  "algo": "PPO (stable-baselines3)",
+  "motions": [
+    "data/motions_retargeted/kw_long_stance.npz",
+    "data/motions_retargeted/kt_vadivu_lowseat.npz",
+    "data/motions_retargeted/kt_warrior_pose.npz",
+    "data/motions_retargeted/ky_warrior_lunge.npz",
+    "data/motions_retargeted/kt_chuvadu_step.npz",
+    "data/motions_retargeted/kw_deep_reach.npz",
+    "data/motions_retargeted/ky_deep_lunge.npz",
+    "data/motions_retargeted/pk_stance_transitions.npz",
+    "data/motions_retargeted/ks_side_kick.npz",
+    "data/motions_retargeted/kw_highkick_right.npz",
+    "data/motions_retargeted/ky_kick_seq.npz",
+    "data/motions_retargeted/pk_kick_lunge.npz"
+  ],
+  "steps": 3000000,
+  "n_envs": 8,
+  "action": "joint target residuals, s_a=0.25 rad",
+  "obs": "proprioception + reference + phase (124d)",
+  "note": "widens single-motion Stage A (logs/stageA_kw_long_stance) to 12 motions across all 3 taxonomy families; still far short of the paper's full corpus"
+}

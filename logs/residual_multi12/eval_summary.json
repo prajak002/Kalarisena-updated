@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "experiment_name": "residual_multi12",
+    "stage": "intent-preserving residual policy, multi-motion",
+    "algo": "PPO (stable-baselines3)",
+    "tracker": "logs/stageA_multi12/tracking_multi_best.zip",
+    "critic": "logs/scvc_multi12/scvc_critic.pt",
+    "motions": [
+      "data/motions_retargeted/kw_long_stance.npz",
+      "data/motions_retargeted/kt_vadivu_lowseat.npz",
+      "data/motions_retargeted/kt_warrior_pose.npz",
+      "data/motions_retargeted/ky_warrior_lunge.npz",
+      "data/motions_retargeted/kt_chuvadu_step.npz",
+      "data/motions_retargeted/kw_deep_reach.npz",
+      "data/motions_retargeted/ky_deep_lunge.npz",
+      "data/motions_retargeted/pk_stance_transitions.npz",
+      "data/motions_retargeted/ks_side_kick.npz",
+      "data/motions_retargeted/kw_highkick_right.npz",
+      "data/motions_retargeted/ky_kick_seq.npz",
+      "data/motions_retargeted/pk_kick_lunge.npz"
+    ],
+    "steps": 1000000,
+    "n_envs": 8
+  },
+  "summary": {
+    "overall": {
+      "residual": {
+        "fall_rate": 0.9583333333333334,
+        "mean_episode_len": 38.5
+      },
+      "tracker_only": {
+        "fall_rate": 0.9166666666666666,
+        "mean_episode_len": 39.958333333333336
+      }
+    },
+    "per_motion": {
+      "kw_long_stance": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 39.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 38.5
+        }
+      },
+      "kt_vadivu_lowseat": {
+        "residual": {
+          "fall_rate": 0.5,
+          "mean_episode_len": 79.0
+        },
+        "tracker_only": {
+          "fall_rate": 0.0,
+          "mean_episode_len": 100.0
+        }
+      },
+      "kt_warrior_pose": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 18.0
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 19.0
+        }
+      },
+      "ky_warrior_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 17.0
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 17.0
+        }
+      },
+      "kt_chuvadu_step": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 22.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 23.0
+        }
+      },
+      "kw_deep_reach": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 67.0
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 70.5
+        }
+      },
+      "ky_deep_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 32.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 33.5
+        }
+      },
+      "pk_stance_transitions": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 48.0
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 46.5
+        }
+      },
+      "ks_side_kick": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 20.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 21.0
+        }
+      },
+      "kw_highkick_right": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 70.0
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 61.0
+        }
+      },
+      "ky_kick_seq": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 24.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 26.5
+        }
+      },
+      "pk_kick_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 23.5
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 23.0
+        }
+      }
+    }
+  }
+}

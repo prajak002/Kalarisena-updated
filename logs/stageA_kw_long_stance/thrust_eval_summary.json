@@ -1,0 +1,17 @@
+[
+  {
+    "force": 20.0,
+    "fell": true,
+    "steps": 34
+  },
+  {
+    "force": 60.0,
+    "fell": false,
+    "steps": 99
+  },
+  {
+    "force": 100.0,
+    "fell": true,
+    "steps": 92
+  }
+]

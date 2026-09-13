@@ -1,0 +1,22 @@
+{
+  "n_frames": 17580,
+  "n_episodes": 200,
+  "positive_rate": 0.3723549488054608,
+  "auroc": 0.9310606856522825,
+  "auprc": 0.8924403350628531,
+  "brier": 0.10445261001586914,
+  "ece": 0.023184765057703977,
+  "policy": "logs/stageA_kw_long_stance/tracking_best.zip",
+  "successor_manifold_mode": "full-success",
+  "feature_names": [
+    "joint_mse",
+    "upright",
+    "base_height",
+    "phase",
+    "com_margin",
+    "cp_margin",
+    "support_area",
+    "com_vx",
+    "com_vy"
+  ]
+}

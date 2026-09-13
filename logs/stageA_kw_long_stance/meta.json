@@ -1,0 +1,11 @@
+{
+  "experiment_name": "stageA_kw_long_stance",
+  "stage": "A (nominal tracking)",
+  "algo": "PPO (stable-baselines3)",
+  "npz": "data/motions_retargeted/kw_long_stance.npz",
+  "steps": 3000000,
+  "n_envs": 8,
+  "action": "joint target residuals, s_a=0.25 rad",
+  "obs": "proprioception + reference + phase (124d)",
+  "note": "minimal Stage A per PAPER_ASSETS.md; single motion"
+}

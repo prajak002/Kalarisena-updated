@@ -234,6 +234,10 @@ class PinocchioWrapper:
         self.left_foot_id = self.model.getFrameId(self.left_foot_frame)
         self.right_foot_id = self.model.getFrameId(self.right_foot_frame)
 
+        # effortLimit[0:6] is the (unbounded, inf) floating-base freeflyer joint;
+        # only the actuated joints from index 6 on have a real URDF effort limit.
+        self.effort_limit = np.array(self.model.effortLimit[6:], dtype=np.float64)
+
     def _resolve_foot_frame(self, side: str, preferred: Iterable[str]) -> str | None:
         for name in preferred:
             if name in self._frame_names:
@@ -305,6 +309,27 @@ class PinocchioWrapper:
         rot = np.array(placement.rotation, dtype=np.float64)
         trans = np.array(placement.translation, dtype=np.float64).reshape(3)
         return (self.foot_contact_offsets @ rot.T) + trans
+
+    def compute_com_jacobian(self, q: np.ndarray) -> np.ndarray:
+        """d(CoM_xyz)/dq, shape [3, nv]."""
+        q = np.asarray(q, dtype=np.float64).reshape(-1)
+        return np.array(pin.jacobianCenterOfMass(self.model, self.data, q), dtype=np.float64)
+
+    def inverse_dynamics(self, q: np.ndarray, dq: np.ndarray, ddq: np.ndarray) -> np.ndarray:
+        """Generalized forces via RNEA, shape [nv]."""
+        q = np.asarray(q, dtype=np.float64).reshape(-1)
+        dq = np.asarray(dq, dtype=np.float64).reshape(-1)
+        ddq = np.asarray(ddq, dtype=np.float64).reshape(-1)
+        return np.array(pin.rnea(self.model, self.data, q, dq, ddq), dtype=np.float64)
+
+    def foot_jacobian(self, q: np.ndarray, side: str) -> np.ndarray:
+        """World-frame linear velocity Jacobian of one foot frame, shape [3, nv]."""
+        q = np.asarray(q, dtype=np.float64).reshape(-1)
+        frame_id = self.left_foot_id if side == "left" else self.right_foot_id
+        pin.computeJointJacobians(self.model, self.data, q)
+        pin.updateFramePlacements(self.model, self.data)
+        J = pin.getFrameJacobian(self.model, self.data, frame_id, pin.LOCAL_WORLD_ALIGNED)
+        return np.array(J[:3, :], dtype=np.float64)
 
     def get_support_features(
         self,

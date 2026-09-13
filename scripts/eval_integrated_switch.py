@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Stage F: integrates trained policies with the existing ModeSwitch
+(src/switch/mode_switch.py) - real threshold-based switching between a
+nominal tracker and a fall policy, per train_switch.py's own docstring
+("Start with threshold-based switching... not learned switch").
+
+No separate learned recovery policy exists (Stage E), so RECOVERY mode
+falls back to the nominal tracker's own action - the same honest
+simplification already used elsewhere in this repo for a_t^safe.
+
+Usage
+  python3 scripts/eval_integrated_switch.py \
+      --nominal logs/stageA_multi12/tracking_multi_best.zip \
+      --fall logs/stageD_fall/fall_best.zip \
+      --out logs/stageF_switch
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.dynamics.pinocchio_wrapper import PinocchioWrapper
+from src.envs.multi_motion_env import MultiMotionTrackEnv
+from src.switch.mode_switch import Mode, ModeSwitch, SwitchConfig
+
+URDF = "assets/unitree_g1/g1_29dof_rev_1_0.urdf"
+
+MOTION_SET = [
+    "data/motions_retargeted/kw_long_stance.npz",
+    "data/motions_retargeted/kt_vadivu_lowseat.npz",
+    "data/motions_retargeted/kt_warrior_pose.npz",
+    "data/motions_retargeted/ky_warrior_lunge.npz",
+    "data/motions_retargeted/kt_chuvadu_step.npz",
+    "data/motions_retargeted/kw_deep_reach.npz",
+    "data/motions_retargeted/ky_deep_lunge.npz",
+    "data/motions_retargeted/pk_stance_transitions.npz",
+    "data/motions_retargeted/ks_side_kick.npz",
+    "data/motions_retargeted/kw_highkick_right.npz",
+    "data/motions_retargeted/ky_kick_seq.npz",
+    "data/motions_retargeted/pk_kick_lunge.npz",
+]
+
+
+def _features(env: MultiMotionTrackEnv, pin: PinocchioWrapper, step_index: int) -> dict:
+    d = env.rt.data
+    q = np.concatenate([d.qpos[0:3], d.qpos[3:7][[1, 2, 3, 0]], d.qpos[env.rt.act_qadr]])
+    dq = np.concatenate([d.qvel[0:3], d.qvel[3:6], d.qvel[env.rt.act_vadr]])
+    left_h_ok, right_h_ok = True, True
+    contacts = np.array([left_h_ok, right_h_ok])
+    feats = pin.get_support_features(q, dq, contacts)
+    hg = pin.compute_centroidal_momentum(q, dq)
+    upright = env.rt.torso_upright_cos()
+    return {
+        "cp_margin": feats["cp_margin"] if feats["support_area"] > 0 else 0.0,
+        "momentum_norm": float(np.linalg.norm(hg[3:])),
+        "base_height": float(env.rt.base_height),
+        "is_fallen": bool(upright < 0.3),
+        "is_upright": bool(upright > 0.7),
+        "step_index": step_index,
+    }
+
+
+def _torso_force(env: MultiMotionTrackEnv) -> float:
+    torso_body = env.rt.mujoco.mj_name2id(env.rt.model, env.rt.mujoco.mjtObj.mjOBJ_BODY, "torso_link")
+    torso_geoms = env.rt._collision_geoms_of_body(torso_body)
+    return env.rt.geom_group_force(torso_geoms)
+
+
+def run_episode(env, pin, nominal, fall, switch: ModeSwitch, use_switch: bool):
+    obs, info = env.reset()
+    switch.reset()
+    done = trunc = False
+    step = 0
+    mode_counts = {m.value: 0 for m in Mode}
+    fell_ever = False
+    while not (done or trunc):
+        feats = _features(env, pin, step)
+        mode = switch.step(feats) if use_switch else Mode.NOMINAL
+        mode_counts[mode.value] += 1
+
+        if mode == Mode.FALL and fall is not None:
+            fall_obs = np.concatenate([obs, [_torso_force(env), 0.0]])
+            action, _ = fall.predict(fall_obs, deterministic=True)
+        else:
+            action, _ = nominal.predict(obs, deterministic=True)
+
+        obs, r, done, trunc, si = env.step(action)
+        fell_ever = fell_ever or si["fell"]
+        step += 1
+    return {"episode_len": step, "fell": int(fell_ever), "mode_counts": mode_counts,
+            "transitions": len(switch.transition_log)}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--nominal", required=True)
+    ap.add_argument("--fall", default=None)
+    ap.add_argument("--out", default="logs/stageF_switch")
+    ap.add_argument("--episodes-per-motion", type=int, default=3)
+    args = ap.parse_args()
+
+    os.makedirs(args.out, exist_ok=True)
+    from stable_baselines3 import PPO
+
+    nominal = PPO.load(args.nominal, device="cpu")
+    fall = PPO.load(args.fall, device="cpu") if args.fall else None
+    pin = PinocchioWrapper(URDF)
+    switch_cfg = SwitchConfig(delta1=0.05, delta2=15.0, delta3=0.20, min_dwell_steps=30)
+
+    results = {"switched": [], "nominal_only": []}
+    per_motion = {}
+    for npz in MOTION_SET:
+        mid = os.path.basename(npz)[:-4]
+        env = MultiMotionTrackEnv([npz], seed=12000)
+        env.max_start = 0
+        rows = {"switched": [], "nominal_only": []}
+        for arm, use_switch in (("switched", True), ("nominal_only", False)):
+            for ep in range(args.episodes_per_motion):
+                switch = ModeSwitch(switch_cfg)
+                row = run_episode(env, pin, nominal, fall, switch, use_switch)
+                rows[arm].append(row)
+                results[arm].append(row)
+        env.close()
+        per_motion[mid] = {
+            arm: {"fall_rate": float(np.mean([r["fell"] for r in rows[arm]])),
+                  "mean_episode_len": float(np.mean([r["episode_len"] for r in rows[arm]])),
+                  "mean_transitions": float(np.mean([r["transitions"] for r in rows[arm]]))}
+            for arm in ("switched", "nominal_only")
+        }
+
+    overall = {arm: {"fall_rate": float(np.mean([r["fell"] for r in results[arm]])),
+                      "mean_episode_len": float(np.mean([r["episode_len"] for r in results[arm]])),
+                      "mean_transitions": float(np.mean([r["transitions"] for r in results[arm]]))}
+               for arm in ("switched", "nominal_only")}
+
+    summary = {"meta": {"nominal": args.nominal, "fall": args.fall, "motions": MOTION_SET,
+                         "note": "RECOVERY mode falls back to the nominal tracker; no Stage E policy exists"},
+               "overall": overall, "per_motion": per_motion}
+    with open(os.path.join(args.out, "eval_summary.json"), "w") as fh:
+        json.dump(summary, fh, indent=2)
+    print(json.dumps(overall, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

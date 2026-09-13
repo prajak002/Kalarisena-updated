@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "experiment_name": "residual_kw_long_stance",
+    "stage": "intent-preserving residual policy (paper Sec 3.3-3.4)",
+    "algo": "PPO (stable-baselines3)",
+    "tracker": "logs/stageA_kw_long_stance/tracking_best.zip",
+    "critic": "logs/scvc_kw_long_stance/scvc_critic.pt",
+    "npz": "data/motions_retargeted/kw_long_stance.npz",
+    "steps": 1000000,
+    "n_envs": 8,
+    "action": "delta_a_t, authority-scaled and gated by g(V_bar_t)",
+    "obs": "base tracking obs (124d) + [V_raw, V_bar, gate, cp_margin, com_margin]",
+    "note": "first trained instance of pi_theta; frozen tracker and frozen critic both narrow-scope (single motion) per their own training runs"
+  },
+  "summary": {
+    "residual": {
+      "tracking_rmse_mean": 0.30115907627059,
+      "fall_rate": 1.0,
+      "mean_episode_len": 61.0,
+      "mean_gate": 0.8859097871274738,
+      "n_episodes": 5
+    },
+    "tracker_only": {
+      "tracking_rmse_mean": 0.30699816318946443,
+      "fall_rate": 1.0,
+      "mean_episode_len": 80.0,
+      "mean_gate": 0.9130133826228534,
+      "n_episodes": 5
+    }
+  }
+}

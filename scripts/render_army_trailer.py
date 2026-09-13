@@ -393,9 +393,12 @@ def draw_hud(img: np.ndarray, px: int, py: int, label: str, title: str,
     if not (-200 < px < w + 200 and -200 < py < h + 200):
         return img
     ov = img.copy()
-    # Dark ink on a white arena: the previous near-white HUD vanished against the floor.
-    ink = (26, 32, 44)
-    accent = (196, 132, 24)
+    # White HUD (Prajak, 2026-08-21): the film's floor is dark terracotta and the
+    # mats are deep purple, so white carries the contrast that dark ink had on the
+    # old white arena. Title a soft white so the label stays the loudest element.
+    ink = (255, 255, 255)
+    accent = (255, 255, 255)
+    title_col = (228, 230, 234)
     k = w / 1920.0                    # scale every dimension with the frame
     lw_line = max(1, int(round(2 * k)))
     rise = int(150 * k)
@@ -416,7 +419,7 @@ def draw_hud(img: np.ndarray, px: int, py: int, label: str, title: str,
              (x0 - int(12 * k), elbow_y + int(38 * k)), accent,
              max(2, int(3 * k)), cv2.LINE_AA)
     cv2.putText(ov, title, (x0, elbow_y - int(10 * k)), cv2.FONT_HERSHEY_SIMPLEX,
-                fs_t, accent, max(1, int(2 * k)), cv2.LINE_AA)
+                fs_t, title_col, max(1, int(2 * k)), cv2.LINE_AA)
     cv2.putText(ov, label, (x0, elbow_y + int(30 * k)), cv2.FONT_HERSHEY_DUPLEX,
                 fs_l, ink, max(1, int(2 * k)), cv2.LINE_AA)
     return cv2.addWeighted(ov, alpha, img, 1.0 - alpha, 0.0)

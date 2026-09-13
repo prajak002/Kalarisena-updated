@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "experiment_name": "stageB_com",
+    "stage": "B (CoM/capture-point recoverability)",
+    "algo": "PPO (stable-baselines3)",
+    "config": "configs/com.yaml",
+    "motions": [
+      "data/motions_retargeted/kw_long_stance.npz",
+      "data/motions_retargeted/kw_long_stance_l.npz",
+      "data/motions_retargeted/kt_vadivu_lowseat.npz",
+      "data/motions_retargeted/kt_warrior_pose.npz",
+      "data/motions_retargeted/ky_warrior_lunge.npz",
+      "data/motions_retargeted/pk_warrior_oneleg.npz"
+    ],
+    "steps": 2000000,
+    "n_envs": 8,
+    "note": "trained from scratch; Stage A checkpoint has a different obs dim"
+  },
+  "summary": {
+    "overall": {
+      "mean_cp_margin": -0.272921388585147,
+      "fall_rate": 1.0
+    },
+    "per_motion": {
+      "kw_long_stance": {
+        "mean_cp_margin": -0.4112316003026835,
+        "fall_rate": 1.0
+      },
+      "kw_long_stance_l": {
+        "mean_cp_margin": -0.274055449409555,
+        "fall_rate": 1.0
+      },
+      "kt_vadivu_lowseat": {
+        "mean_cp_margin": -0.02988574583164998,
+        "fall_rate": 1.0
+      },
+      "kt_warrior_pose": {
+        "mean_cp_margin": -0.27282362457507076,
+        "fall_rate": 1.0
+      },
+      "ky_warrior_lunge": {
+        "mean_cp_margin": -0.38606250180548746,
+        "fall_rate": 1.0
+      },
+      "pk_warrior_oneleg": {
+        "mean_cp_margin": -0.26346940958643494,
+        "fall_rate": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,530 @@
+{
+  "overall": {
+    "tracker_only": {
+      "mpjpe_mean": 0.2816357231731888,
+      "ipr": 0.0,
+      "n_rollouts": 36,
+      "ipr_force_0N": 0.0,
+      "ipr_force_40N": 0.0,
+      "ipr_force_80N": 0.0
+    },
+    "residual_gated": {
+      "mpjpe_mean": 0.2823349077345376,
+      "ipr": 0.0,
+      "n_rollouts": 36,
+      "ipr_force_0N": 0.0,
+      "ipr_force_40N": 0.0,
+      "ipr_force_80N": 0.0
+    }
+  },
+  "per_rollout": {
+    "tracker_only": [
+      {
+        "mpjpe": 0.20308967219839236,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.24240931406860844,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.23499598935249855,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.15252011243403393,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.11673188174868061,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.29797020848082173,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.19304352235299133,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.3384163864838537,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.19603023294431948,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.21642608971975955,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.16655304704598353,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.4024559842856107,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.11881247551121081,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.12099927501866815,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.20753758782490583,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.3043864799656872,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.2330583659515595,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.29021138154633813,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.5430665746756487,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.38534413305087667,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.262306207768594,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.4801216570315055,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.3112689241597791,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.1958481117909162,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.08451976522358806,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.39991521421960774,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.15844506673852857,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.3795061855934026,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.46299504062111363,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.3863683881685988,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.39739120374968334,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.24412252169733795,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.2664671088094213,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.307871250148938,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.6406065159974805,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.19707415785585133,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 80.0
+      }
+    ],
+    "residual_gated": [
+      {
+        "mpjpe": 0.17605093551728554,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.22341087119808886,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.22691062261186842,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_long_stance",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.13730167226252699,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.23677387308608255,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.35189195195110645,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_vadivu_lowseat",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.386163858165922,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.4101672850333009,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.17269408068416606,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_warrior_pose",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.1091108506279165,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.45224625810647867,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.439833774888337,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_warrior_lunge",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.1781980486472557,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.2637665673305643,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.21407266417589552,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kt_chuvadu_step",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.321145426344483,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.5186422796194505,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.21688532666648677,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_deep_reach",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.1256261232804419,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.4335757852037061,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.2812876225436949,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_deep_lunge",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.486310701242241,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.2711484755518239,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.1809234406309248,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_stance_transitions",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.23395183159732652,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.08125344019115231,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.1830206836285283,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ks_side_kick",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.4482556868514981,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.36950774817162346,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.41576557207430753,
+        "completed": false,
+        "fell": true,
+        "motion_id": "kw_highkick_right",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.23054740838971646,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.22014964988576338,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.23908750081116914,
+        "completed": false,
+        "fell": true,
+        "motion_id": "ky_kick_seq",
+        "push_force": 80.0
+      },
+      {
+        "mpjpe": 0.21080875599024665,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 0.0
+      },
+      {
+        "mpjpe": 0.5144946092552916,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 40.0
+      },
+      {
+        "mpjpe": 0.20307529622667983,
+        "completed": false,
+        "fell": true,
+        "motion_id": "pk_kick_lunge",
+        "push_force": 80.0
+      }
+    ]
+  }
+}

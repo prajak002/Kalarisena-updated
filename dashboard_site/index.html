@@ -1,0 +1,543 @@
+<title>KalariSena</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Public+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --paper:      #EDEFE3;
+    --paper-raised: #F7F8EF;
+    --ink:        #232F29;
+    --ink-soft:   #5C6B5F;
+    --line:       #D9DBC7;
+    --accent:     #B5721E;
+    --accent-soft:#EADFC2;
+    --oxide:      #9E4630;
+    --oxide-soft: #EFDAD3;
+    --done:       #3E7A63;
+    --done-soft:  #DCE9E1;
+    --track:      #E2E4D3;
+    --shadow:     0 1px 2px rgba(35,47,41,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:      #1B211C;
+      --paper-raised: #222922;
+      --ink:        #E7E9DC;
+      --ink-soft:   #9AA894;
+      --line:       #333B30;
+      --accent:     #E0A24C;
+      --accent-soft:#3B301C;
+      --oxide:      #D9836A;
+      --oxide-soft: #3A2620;
+      --done:       #6FBFA0;
+      --done-soft:  #1F332B;
+      --track:      #262E24;
+      --shadow:     0 1px 2px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:      #1B211C;
+    --paper-raised: #222922;
+    --ink:        #E7E9DC;
+    --ink-soft:   #9AA894;
+    --line:       #333B30;
+    --accent:     #E0A24C;
+    --accent-soft:#3B301C;
+    --oxide:      #D9836A;
+    --oxide-soft: #3A2620;
+    --done:       #6FBFA0;
+    --done-soft:  #1F332B;
+    --track:      #262E24;
+    --shadow:     0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, sans-serif;
+    font-weight:400;
+    padding:0 20px;
+  }
+  .wrap{
+    max-width:840px;
+    margin:0 auto;
+    padding-block:36px 64px;
+    display:flex;
+    flex-direction:column;
+    gap:40px;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:400;
+    text-wrap:balance;
+    margin:0;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  p{ line-height:1.6; margin:0; }
+  .lede{ color:var(--ink-soft); font-size:15.5px; line-height:1.65; max-width:64ch; }
+
+  /* ---- header ---- */
+  header{ display:flex; flex-direction:column; gap:14px; padding-top:4px; }
+  header h1{ font-size:clamp(32px,6vw,44px); }
+  .status-row{
+    display:flex; flex-wrap:wrap; gap:10px 22px;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);
+    border-top:1px solid var(--line); padding-top:14px;
+  }
+  .status-row span b{ font-weight:400; color:var(--ink); }
+  .status-row span{ display:flex; gap:6px; }
+
+  /* ---- section shell ---- */
+  section{ display:flex; flex-direction:column; gap:18px; }
+  .section-head{ display:flex; flex-direction:column; gap:6px; }
+  .section-head h2{ font-size:24px; color:var(--ink); }
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+  }
+
+  /* ---- stage list ---- */
+  .stage-row{
+    display:grid;
+    grid-template-columns:34px 1fr auto;
+    gap:14px;
+    align-items:start;
+    padding:12px 0;
+    border-top:1px solid var(--line);
+  }
+  .stage-row:first-of-type{ border-top:none; padding-top:0; }
+  .stage-id{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; color:var(--ink-soft);
+    padding-top:2px;
+  }
+  .stage-body h3{ font-size:15.5px; font-family:'Public Sans'; font-weight:400; margin-bottom:3px; }
+  .stage-body p{ font-size:14px; color:var(--ink-soft); max-width:56ch; }
+  .pill{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.03em;
+    padding:4px 9px; border-radius:20px;
+    white-space:nowrap; height:fit-content;
+    text-transform:uppercase;
+  }
+  .pill.done{ background:var(--done-soft); color:var(--done); }
+  .pill.planned{ background:var(--accent-soft); color:var(--accent); }
+  .pill.stretch{ background:var(--oxide-soft); color:var(--oxide); }
+
+  /* ---- gantt ---- */
+  .gantt{ display:flex; flex-direction:column; gap:10px; }
+  .gantt-scale{
+    display:flex; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);
+    padding-left:96px;
+  }
+  .gantt-row{ display:flex; align-items:center; gap:12px; }
+  .gantt-label{
+    width:84px; flex-shrink:0;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft);
+  }
+  .gantt-track{
+    position:relative; flex:1; height:26px;
+    background:var(--track); border-radius:5px;
+  }
+  .gantt-today{
+    position:absolute; top:-4px; bottom:-4px; width:2px;
+    background:var(--oxide);
+  }
+  .gantt-bar{
+    position:absolute; top:3px; bottom:3px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; color:var(--ink);
+    display:flex; align-items:center; padding-left:6px;
+    overflow:hidden; white-space:nowrap;
+  }
+  .gantt-note{ font-size:12px; color:var(--ink-soft); }
+  .gantt-note b{ font-weight:400; color:var(--oxide); }
+
+  /* ---- decisions ---- */
+  ul.plain{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+  ul.plain li{ font-size:14.5px; color:var(--ink-soft); line-height:1.55; padding-left:18px; position:relative; }
+  ul.plain li::before{
+    content:'—'; position:absolute; left:0; color:var(--accent);
+  }
+
+  /* ---- walkthrough ---- */
+  .track-label{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.04em;
+    text-transform:uppercase; color:var(--ink-soft);
+  }
+  .steps{ display:flex; flex-direction:column; }
+  .step{
+    display:grid; grid-template-columns:28px 1fr; gap:14px;
+    padding:11px 0;
+    position:relative;
+  }
+  .step::before{
+    content:''; position:absolute; left:13px; top:0; bottom:0; width:1px;
+    background:var(--line);
+  }
+  .step:first-child::before{ top:14px; }
+  .step:last-child::before{ bottom:calc(100% - 14px); }
+  .step-num{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--paper-raised);
+    background:var(--ink-soft); border-radius:50%;
+    width:22px; height:22px; display:flex; align-items:center; justify-content:center;
+    z-index:1; margin-top:2px;
+  }
+  .step p{ font-size:14.5px; color:var(--ink-soft); line-height:1.6; }
+  .step p em{ font-style:normal; color:var(--ink); }
+
+  .film-para{ font-size:14.5px; color:var(--ink-soft); line-height:1.65; }
+  .film-para em{ font-style:normal; color:var(--ink); }
+
+  /* ---- novelty ---- */
+  .novelty-item{ display:flex; flex-direction:column; gap:6px; }
+  .novelty-item h3{ font-size:16px; font-family:'Public Sans'; font-weight:400; }
+  .novelty-item .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--oxide); text-transform:uppercase; letter-spacing:0.03em; }
+  .novelty-item p{ font-size:14.5px; color:var(--ink-soft); line-height:1.65; }
+
+  .callout{
+    border:1px solid var(--line);
+    border-left:3px solid var(--oxide);
+    background:var(--paper);
+    border-radius:6px;
+    padding:16px 18px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .callout .eyebrow{ color:var(--oxide); }
+  .callout p{ font-size:13.5px; color:var(--ink-soft); line-height:1.6; }
+  .callout p b{ font-weight:400; color:var(--ink); }
+
+  /* ---- video grid ---- */
+  .video-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:18px;
+  }
+  .video-card{ display:flex; flex-direction:column; gap:8px; }
+  .video-thumb{
+    position:relative; border-radius:8px; overflow:hidden;
+    border:1px solid var(--line); aspect-ratio:16/9; background:#0c0f0b;
+  }
+  .video-thumb video{ width:100%; height:100%; object-fit:contain; display:block; background:#0c0f0b; }
+  .video-thumb .dur{
+    position:absolute; right:6px; top:6px;
+    background:rgba(0,0,0,0.55); color:#fff;
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    padding:2px 6px; border-radius:4px;
+    pointer-events:none; z-index:1;
+  }
+  .video-meta h3{ font-size:14.5px; font-family:'Public Sans'; font-weight:400; }
+  .video-meta .spec{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);
+  }
+  .video-meta p{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin-top:2px; }
+  .video-note{ font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+  .video-note code{
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px;
+    background:var(--track); padding:1px 5px; border-radius:4px; color:var(--ink);
+  }
+
+  footer{
+    border-top:1px solid var(--line); padding-top:16px;
+    font-size:12px; color:var(--ink-soft); line-height:1.6;
+  }
+
+  @media (max-width:480px){
+    .gantt-scale{ padding-left:0; }
+    .gantt-label{ width:60px; font-size:11px; }
+    .stage-row{ grid-template-columns:26px 1fr; }
+    .stage-row .pill{ grid-column:2; width:fit-content; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Status · 11 Sep 2026</span>
+    <h1>KalariSena</h1>
+    <p class="lede">A humanoid Kalaripayattu corps: reinforcement learning staged on captured Indian martial-arts motion, and a cinematic arena film of the same corps performing among five of India's monuments. This page is the plan, how the work got here, what's actually novel about it, and the film cuts it has produced so far.</p>
+    <div class="status-row">
+      <span>research pipeline: <b>stages A–F built, G/H/I planned</b></span>
+      <span>film pipeline: <b>v7 cut rendered, local Blender path</b></span>
+      <span>today: <b>day 4 of the 4-week G/H/I roadmap</b></span>
+    </div>
+  </header>
+
+  <section id="plan">
+    <div class="section-head">
+      <span class="eyebrow">01 · Plan</span>
+      <h2>Where the RL curriculum stands, and what's next</h2>
+      <p class="lede">Stages A through F already run end to end: a PPO curriculum that tracks a reference motion, holds its centre of mass over the support polygon, manages momentum, absorbs falls, recovers from them, and switches between those modes on a threshold rule. Stages G, H and I below are the open plan — the work that turns a working pipeline into a research result.</p>
+    </div>
+
+    <div class="panel">
+      <div class="stage-row">
+        <span class="stage-id">A</span>
+        <div class="stage-body"><h3>Tracking</h3><p>PPO residual tracking on one reference motion. 124-dim obs, PD control at 500Hz.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">B</span>
+        <div class="stage-body"><h3>Centre of mass</h3><p>Adds a capture-point margin reward, oversamples the stable-stance and single-support clip families.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">C</span>
+        <div class="stage-body"><h3>Momentum</h3><p>Adds a momentum reward, phase-weights the rotational and explosive-strike families.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">D</span>
+        <div class="stage-body"><h3>Fall-safe</h3><p>Trains from near-fall states, penalises head and torso impact.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">E</span>
+        <div class="stage-body"><h3>Recovery</h3><p>Trains from randomised fallen states toward standing again.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">F</span>
+        <div class="stage-body"><h3>Mode switch</h3><p>Threshold finite-state machine across nominal, fall and recovery, with hysteresis.</p></div>
+        <span class="pill done">done</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">G</span>
+        <div class="stage-body"><h3>GA joint-pool evolution</h3><p>Evolves physically plausible transitions between clips nobody captured. Owner A.</p></div>
+        <span class="pill planned">planned</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">H</span>
+        <div class="stage-body"><h3>Thrust absorption</h3><p>Turns the one-off push-sweep eval into a real disturbance-training curriculum. Owners B, C, D.</p></div>
+        <span class="pill planned">planned</span>
+      </div>
+      <div class="stage-row">
+        <span class="stage-id">I</span>
+        <div class="stage-body"><h3>World model</h3><p>Predicts next state from current state, action and estimated force. Owner E.</p></div>
+        <span class="pill stretch">stretch</span>
+      </div>
+    </div>
+
+    <div class="panel gantt">
+      <div class="gantt-scale">
+        <span>7 Sep</span><span>14 Sep</span><span>21 Sep</span><span>5 Oct</span>
+      </div>
+
+      <div class="gantt-row">
+        <span class="gantt-label">Owner A · G</span>
+        <div class="gantt-track">
+          <div class="gantt-bar" style="left:0%; width:17.9%;">GA operators + fitness</div>
+          <div class="gantt-bar" style="left:17.9%; width:17.9%;">evolve pool, stability plot</div>
+          <div class="gantt-bar" style="left:35.7%; width:14.3%;">fold into A/B data</div>
+          <div class="gantt-today" style="left:14.3%;"></div>
+        </div>
+      </div>
+      <div class="gantt-row">
+        <span class="gantt-label">Owner B · H</span>
+        <div class="gantt-track">
+          <div class="gantt-bar" style="left:0%; width:17.9%;">thrust env skeleton</div>
+          <div class="gantt-bar" style="left:17.9%; width:17.9%;">curriculum + tests</div>
+          <div class="gantt-bar" style="left:35.7%; width:17.9%;">tier-1 run</div>
+          <div class="gantt-bar" style="left:53.6%; width:17.9%;">full curriculum training</div>
+          <div class="gantt-today" style="left:14.3%;"></div>
+        </div>
+      </div>
+      <div class="gantt-row">
+        <span class="gantt-label">Owner C · H</span>
+        <div class="gantt-track">
+          <div class="gantt-bar" style="left:10.7%; width:14.3%;">force-estimator obs</div>
+          <div class="gantt-bar" style="left:25%; width:14.3%;">reward terms</div>
+          <div class="gantt-bar" style="left:39.3%; width:21.4%;">extended push-sweep eval</div>
+          <div class="gantt-today" style="left:14.3%;"></div>
+        </div>
+      </div>
+      <div class="gantt-row">
+        <span class="gantt-label">Owner D · int.</span>
+        <div class="gantt-track">
+          <div class="gantt-bar" style="left:25%; width:10.7%;">switch decision</div>
+          <div class="gantt-bar" style="left:35.7%; width:17.9%;">train_thrust.py wiring</div>
+          <div class="gantt-bar" style="left:53.6%; width:17.9%;">end-to-end A→F→H run</div>
+          <div class="gantt-bar" style="left:71.4%; width:7.1%;">readme + diagram</div>
+          <div class="gantt-today" style="left:14.3%;"></div>
+        </div>
+      </div>
+      <div class="gantt-row">
+        <span class="gantt-label">Owner E · I</span>
+        <div class="gantt-track">
+          <div class="gantt-bar" style="left:25%; width:21.4%;">dynamics model + logging</div>
+          <div class="gantt-bar" style="left:46.4%; width:25%;">anticipation or ablation demo</div>
+          <div class="gantt-bar" style="left:71.4%; width:17.9%;">figures + presentation</div>
+          <div class="gantt-today" style="left:14.3%;"></div>
+        </div>
+      </div>
+      <p class="gantt-note">the <b>—</b> line marks today, four days into week one. A and B start with no upstream dependency; C waits on B's env stepping; D is the integration sink; E needs real Stage H rollouts before it can train on them.</p>
+    </div>
+
+    <div class="panel">
+      <span class="eyebrow" style="margin-bottom:8px; display:block;">still open</span>
+      <ul class="plain">
+        <li>Stage H as its own switch state versus an augmentation of nominal — leaning toward augmentation first, and only adding a dedicated impact mode if that can't hold the capture-point margin.</li>
+        <li>GA fitness weights across stability, smoothness and family-coherence — needs one pass of evolved trajectories to eyeball before the values lock.</li>
+        <li>World-model demo: push-anticipation reads better live, the sample-efficiency ablation reads more rigorous on paper — the choice follows whichever the advisor asks to see.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="walkthrough">
+    <div class="section-head">
+      <span class="eyebrow">02 · Walkthrough</span>
+      <h2>How the work got here</h2>
+      <p class="lede">Two pipelines share one motion library: the research track trains a robot to survive being a martial artist, the film track shows one performing like one.</p>
+    </div>
+
+    <div class="panel">
+      <span class="track-label">research pipeline</span>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <p>Source footage: Kalaripayattu clips from Kerala Tourism and Kalari Warriors, one motion per clip.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p><em>GEM-X</em> retargets the captured human pose onto the Unitree G1's skeleton — SAM-3D-Body, then SOMA, then a soma-retargeter pass. Five install defects in that chain were found and fixed along the way.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p><em>annotate_motion_library.py</em> writes each clip to <em>data/motions_retargeted/*.npz</em> and tags it into one of four families — stable stance, translational, explosive strike, rotational — in <em>configs/motion_families.yaml</em>.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <p>Stages A–F train against that library in order: tracking, then centre of mass, then momentum, then fall, then recovery, then the mode switch.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <p><em>sim_push_sweep.py</em> audits the trained switch with lateral pelvis pushes, 0–100N, from a horse stance — the seed Stage H grows into a full curriculum.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">6</span>
+          <p>Every reward and every evaluation number reads centre of mass, capture point and support polygon from one place — <em>src/dynamics/pinocchio_wrapper.py</em> — nothing recomputes that math twice.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="gap:10px; display:flex; flex-direction:column;">
+      <span class="track-label">arena film pipeline</span>
+      <p class="film-para">The same retargeted library also feeds a cinematic track: the G1 corps performing a set of moves inside an arena built from five real Indian monuments under Creative Commons licence — <em>Charminar</em>, <em>Qutub Minar</em>, the <em>Gateway of India</em>, the <em>Taj Mahal</em>, and the Indian flag. Early cloud-GPU 4K runs kept dying at scene-build, so the arena now renders end to end on a local Blender pipeline, with the cloud box reserved only for re-export. That pipeline has produced a full 4K cut and five shorter edits, all in the outputs section below.</p>
+    </div>
+  </section>
+
+  <section id="novelty">
+    <div class="section-head">
+      <span class="eyebrow">03 · Novelty</span>
+      <h2>What makes this a research result, not just a pipeline</h2>
+    </div>
+
+    <div class="panel" style="display:flex; flex-direction:column; gap:20px;">
+      <div class="novelty-item">
+        <span class="tag">Stage G</span>
+        <h3>Evolving the transitions nobody captured</h3>
+        <p>No clip in the library goes from <em style="color:var(--ink); font-style:normal;">ky_warrior_lunge</em> to <em style="color:var(--ink); font-style:normal;">pk_kick_lunge</em> — that transition was never filmed. Stage G fills gaps like it with a genetic algorithm over a 5–7 keyframe, 29-DOF chromosome, seeded from the two real neighbouring clips rather than random noise, and scored on the same stability primitives — <em style="color:var(--ink); font-style:normal;">com_support_margin</em>, <em style="color:var(--ink); font-style:normal;">capture_point_margin</em> — the RL reward already computes. It runs in low single-digit minutes on CPU per transition, because filling in a keyframe gap is a static trajectory-optimisation problem, not a sequential decision one. RL stays reserved for what it's actually good at.</p>
+      </div>
+      <div class="novelty-item">
+        <span class="tag">Stage H</span>
+        <h3>Training for a push, not just measuring one</h3>
+        <p>sim_push_sweep.py already answers whether a trained policy survives a lateral push — but only as a one-off audit, after training is done. Stage H turns that into a curriculum the policy trains against directly: full 360-degree direction, a randomised contact point on the pelvis, torso or a limb to emulate a strike or an obstacle rather than a clean push, and a force ramp gated on the policy's own success rate. That is the gap between evaluating robustness and training for it.</p>
+      </div>
+      <div class="novelty-item">
+        <span class="tag">Stage I · stretch</span>
+        <h3>A model that predicts the hit before it lands</h3>
+        <p>A forward-dynamics model trained on the rollout logs every stage already writes, predicting the next joint state and centre of mass from the current one, the action taken, and the estimated external force. This is the piece the plan itself flags as what turns the project from an engineering pipeline into a research result — held as a stretch goal deliberately, so it never blocks demoing Stages G and H on their own.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="eyebrow">what's actually been measured so far</span>
+      <p>The 49 trials currently in <b>results_paper/trials.csv</b> ran against a scripted PD plus threshold-switch controller — not yet the trained Stage A–F policies now in the codebase. Closing that gap is what Stage G and H are for. On that scripted baseline: zero falls up to 100N of lateral force, certain falls at 120N and above. In a 420N impact test, the same controller kept the torso in contact 5 of 5 times against an explicitly protective variant's 2 of 5 — but head force measured zero in both arms, so that is <b>not</b> evidence of head protection, and isn't claimed as any. The capture-point margin threshold used in training, δ₁ = 0.015, was corrected down from the 0.05 written in switch.yaml after measuring the real horse-stance margin with true foot geometry (+0.026m) — the smaller, honest number is what everything downstream uses.</p>
+    </div>
+  </section>
+
+  <section id="outputs">
+    <div class="section-head">
+      <span class="eyebrow">04 · Video outputs</span>
+      <h2>What the film pipeline has rendered so far</h2>
+      <p class="lede">Six cuts, all sharing the same retargeted G1 corps and monument arena, edited for different lengths and audiences.</p>
+    </div>
+
+    <div class="video-grid">
+      <div class="video-card">
+        <div class="video-thumb">
+          <video controls preload="metadata" poster="thumbs/v7.jpg" src="videos/v7.mp4"></video>
+          <span class="dur">0:46</span>
+        </div>
+        <div class="video-meta">
+          <h3>Arena film — v7</h3>
+          <span class="spec">source 3840×2160, 318MB · played here at 960×540, 12MB</span>
+          <p>The full corps performing among Charminar, Qutub Minar, the Gateway of India and the Taj Mahal.</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb">
+          <video controls preload="metadata" poster="thumbs/trailer.jpg" src="videos/trailer.mp4"></video>
+          <span class="dur">1:00</span>
+        </div>
+        <div class="video-meta">
+          <h3>Army trailer — UHD</h3>
+          <span class="spec">source 3840×1606, 94MB · played here at 960×401, 2.7MB</span>
+          <p>A shorter cut built for sharing outside the lab.</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb">
+          <video controls preload="metadata" poster="thumbs/attack.jpg" src="videos/attack.mp4"></video>
+          <span class="dur">0:51</span>
+        </div>
+        <div class="video-meta">
+          <h3>Attack — six moves</h3>
+          <span class="spec">960×720 · 5.6MB · full source quality</span>
+          <p>A themed six-move sequence pulled from the same corps animation.</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb">
+          <video controls preload="metadata" poster="thumbs/defense.jpg" src="videos/defense.mp4"></video>
+          <span class="dur">0:47</span>
+        </div>
+        <div class="video-meta">
+          <h3>Defense — six moves</h3>
+          <span class="spec">960×720 · 4.8MB · full source quality</span>
+          <p>The defensive counterpart to the attack cut, same corps and arena.</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb">
+          <video controls preload="metadata" poster="thumbs/practice.jpg" src="videos/practice.mp4"></video>
+          <span class="dur">0:56</span>
+        </div>
+        <div class="video-meta">
+          <h3>Practice — six moves</h3>
+          <span class="spec">960×720 · 4.2MB · full source quality</span>
+          <p>A slower, drill-style six-move cut for training reference rather than performance.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="video-note">Every clip above plays the real render, not a mock-up. The two 4K/UHD cuts are re-encoded to 960px wide so they fit on the page — the source 4K files (318MB and 94MB) still live locally under <code>kalariSena/</code>. The three 6-move cuts play at their original file quality.</p>
+  </section>
+
+  <footer>
+    3D assets under Creative Commons licence — Charminar (Shreyas, CC BY 4.0), Indian flag (pingupingu, CC BY 4.0), Qutub Minar (popingo, CC BY 4.0), Gateway of India (RakeshCreates, CC BY-NC 4.0), Taj Mahal (AtheneaAtlas, CC BY-NC 4.0). The two BY-NC models are not cleared for commercial release.
+  </footer>
+
+</div>

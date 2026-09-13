@@ -1,0 +1,9 @@
+{
+  "experiment_name": "stageE_recovery",
+  "stage": "E (recovery-to-standing)",
+  "algo": "PPO (stable-baselines3)",
+  "config": "configs/recovery.yaml",
+  "steps": 2000000,
+  "n_envs": 8,
+  "note": "starts from a randomized settled fallen pose, no reference motion"
+}
