@@ -1,14 +1,6 @@
-"""Counterfactual perturbation sampler for SCVC training (paper Sec 3.3, D_pert).
-
-The paper's D_pert covers external impulse, friction, mass/inertia, latency,
-observation noise, contact timing, and phase. This implementation covers the
-two dimensions that don't require reloading the MuJoCo model per trial:
-external impulse (direction, magnitude, timing - reusing the exact
-`rt.pelvis_body` / `xfrc_applied` mechanism scripts/sim_push_sweep.py already
-uses) and observation noise. Friction/mass/inertia/latency randomization would
-need per-episode model reconstruction, which G1MujocoRuntime does not support
-live; that is a real, stated scope limit, not something quietly skipped.
-"""
+"""Counterfactual perturbation sampler for SCVC training: external impulse
+(direction, magnitude, timing, via `rt.pelvis_body` / `xfrc_applied`) and
+observation noise."""
 
 from __future__ import annotations
 
@@ -73,14 +65,8 @@ class PushSegment:
 
 
 class PushPattern:
-    """A user-controlled *sequence* of pushes for scripts/sim_controlled_perturbation.py.
-
-    Duck-types the same (`.active(t)`, `.force_x`, `.force_y`, `.obs_noise_std`)
-    interface PerturbedTrackEnv.step() expects of a single Perturbation, but
-    resolves against whichever of several time-windowed segments is active -
-    so one episode can be pushed repeatedly (e.g. a "relentless" pattern)
-    instead of only once.
-    """
+    """Sequence of push segments; duck-types Perturbation's
+    (`.active(t)`, `.force_x`, `.force_y`, `.obs_noise_std`) interface."""
 
     def __init__(self, segments: list[PushSegment], obs_noise_std: float = 0.0):
         self.segments = segments

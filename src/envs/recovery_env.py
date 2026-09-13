@@ -20,11 +20,8 @@ UPRIGHT_DWELL_STEPS = 30
 
 
 class RecoveryEnv(gym.Env):
-    """Stage E: recovery-to-standing from a fallen pose - no reference
-    motion to track, so this does not extend KalariTrackEnv. Reset drops
-    the robot from a randomized tipped-over orientation and lets it settle
-    onto the ground under real contact dynamics before the episode starts;
-    the policy then has MAX_STEPS to get upright and stay there."""
+    """Recovery-to-standing from a randomized fallen pose; no reference
+    motion, so this does not extend KalariTrackEnv."""
 
     metadata = {"render_modes": ["rgb_array"]}
 

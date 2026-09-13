@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
-"""The "controlled environment" for testing balance recovery: you specify a
-push pattern (timing, direction, magnitude, repeat count - one push or many
-across an episode), it renders an annotated video showing, frame by frame,
-the push applied, the real capture-point margin and angular momentum, which
-control mode is active (NOMINAL / FALL / RECOVERY, when --fall is given so
-real switching is used - src/switch/mode_switch.py), and whether/when the
-robot falls. This is a batch tool, not a live GUI: give it a pattern, get
-back the video of exactly what happened.
-
-Uses the real trained checkpoints and the real PerturbedTrackEnv force
-injection (src/viability/perturbed_env.py) - the same xfrc_applied mechanism
-every other perturbation script in this repo uses. No behavior is scripted
-or faked: what you see the policy do is what the policy does.
+"""Apply a push pattern (timing, direction, magnitude, one or many pushes
+per episode) to a trained policy via PerturbedTrackEnv, optionally routed
+through the real ModeSwitch (--fall enables NOMINAL/FALL/RECOVERY
+switching), and render an annotated video: push arrow, capture-point
+margin, angular momentum, active mode, fall status.
 
 Usage
-  # one push, tracker only (no --fall given -> mode switching is skipped,
-  # exactly the raw-tracker-under-a-push evaluation scripts/eval_thrust_response.py does)
+  # one push, tracker only
   python3 scripts/sim_controlled_perturbation.py \
       --nominal logs/stageA_multi_full/tracking_multi_full_best.zip \
       --npz data/motions_retargeted/kw_long_stance.npz \
@@ -123,11 +114,8 @@ def run_episode(env: PerturbedTrackEnv, nominal, fall, recovery,
             fall_obs = np.concatenate([obs, [env.torso_force(), 0.0]])
             action, _ = fall.predict(fall_obs, deterministic=True)
         elif mode == Mode.RECOVERY and recovery is not None:
-            # Stage E's RecoveryEnv has its own observation space (no
-            # reference motion, so it can't consume the tracker's obs
-            # directly) - real limitation, stated rather than papered
-            # over: fall back to the nominal tracker, same simplification
-            # scripts/eval_integrated_switch.py already uses.
+            # RecoveryEnv's observation space differs from the tracker's;
+            # fall back to the nominal tracker (see eval_integrated_switch.py).
             action, _ = nominal.predict(obs, deterministic=True)
         else:
             action, _ = nominal.predict(obs, deterministic=True)
@@ -154,8 +142,8 @@ def run_episode(env: PerturbedTrackEnv, nominal, fall, recovery,
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--nominal", required=True)
-    ap.add_argument("--fall", default=None, help="Stage D policy; enables real mode switching")
-    ap.add_argument("--recovery", default=None, help="Stage E policy (falls back to nominal for now - see run_episode)")
+    ap.add_argument("--fall", default=None, help="Stage D policy; enables mode switching")
+    ap.add_argument("--recovery", default=None, help="Stage E policy")
     ap.add_argument("--npz", required=True)
     ap.add_argument("--push", type=float, nargs=4, action="append", metavar=("T", "ANGLE_DEG", "MAG_N", "DUR_S"),
                      help="One push segment; repeat for multiple pushes in one episode")

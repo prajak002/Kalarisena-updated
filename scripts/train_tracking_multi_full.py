@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
-"""Multi-motion Stage A training on the FULL retargeted corpus, using the
-train/val/test split in data/splits/ instead of a fixed hand-picked
-12-motion subset (logs/stageA_multi12, scripts/train_tracking_multi.py).
-
-This directly closes two gaps left open in the paper-vs-repo audit:
-  - "Full 100-hour corpus": trains on all 56 train-split motions (of 70
-    total retargeted clips) instead of a fixed 12.
-  - "True motion-held-out generalization split": evaluates separately on
-    the 14 val+test motions the policy never trains on, so the reported
-    fall-rate / tracking-RMSE numbers are genuine held-out generalization,
-    not train-set performance.
+"""Multi-motion Stage A training on the full retargeted corpus, using the
+train/val/test split in data/splits/ instead of the fixed 12-motion subset
+in scripts/train_tracking_multi.py. Evaluates separately on the held-out
+val+test motions the policy never trains on.
 
 Usage
   python3 scripts/train_tracking_multi_full.py --steps 20000000 --n-envs 48 \
@@ -124,9 +117,7 @@ def evaluate_split(model, motions: list[str], out_dir: str, tag: str,
 
 
 def evaluate(model, out_dir: str, record_video: bool = True) -> dict:
-    """Evaluate on both the train split (in-distribution) and the held-out
-    val+test split (genuine generalization), so the gap between the two is
-    reported explicitly."""
+    """Evaluate on the train split and the held-out val+test split separately."""
     train_summary = evaluate_split(model, TRAIN_SET, out_dir, "train",
                                     record_video=False)
     heldout_summary = evaluate_split(model, HELDOUT_SET, out_dir, "heldout",
@@ -141,11 +132,7 @@ def main() -> int:
     ap.add_argument("--out", default="logs/stageA_multi_full")
     ap.add_argument("--eval-only", action="store_true")
     ap.add_argument("--smoke", action="store_true")
-    ap.add_argument("--device", default="cpu",
-                     help="PPO device. MlpPolicy + vectorized CPU MuJoCo envs "
-                          "run faster on cpu than cuda (SB3's own guidance) - "
-                          "the GPU box's value here is its 24 CPU cores for "
-                          "many parallel envs, not the GPU itself.")
+    ap.add_argument("--device", default="cpu")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -172,10 +159,7 @@ def main() -> int:
         "steps": args.steps, "n_envs": args.n_envs, "device": args.device,
         "action": "joint target residuals, s_a=0.25 rad",
         "obs": "proprioception + reference + phase (124d)",
-        "note": ("supersedes logs/stageA_multi12's fixed 12-motion subset with "
-                 "the full 56-motion train split; reports held-out (val+test, "
-                 "14 motions never trained on) generalization separately from "
-                 "in-distribution (train-split) performance."),
+        "note": "full 56-motion train split; held-out eval on val+test (14 motions)",
     }
     with open(os.path.join(args.out, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)

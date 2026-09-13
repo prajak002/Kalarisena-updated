@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """SCVC critic trained against the multi-motion tracker
-(logs/stageA_multi12/tracking_multi_best.zip) instead of the single-motion
-one. The successor manifold is now built from successful late-phase frames
-pooled across all 12 motions rather than one - a step toward the paper's
-cross-skill successor-entry set, though still not conditioned on which
-specific motion's completion region a given frame is closest to.
+(logs/stageA_multi12/tracking_multi_best.zip). The successor manifold is
+built from successful late-phase frames pooled across all 12 motions,
+without conditioning on which motion a given frame belongs to.
 
 Usage
   python3 scripts/train_viability_critic_multi.py \

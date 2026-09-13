@@ -4,9 +4,8 @@
 A fall is forced with a large lateral pelvis push from the Kalari horse stance.
 
   Arm 1 "tracking_only"  : the controller keeps tracking the reference motion
-                           whatever happens (the paper's "tracking alone fails"
-                           condition). ModeSwitch still runs and its events are
-                           logged, but its output is not acted on.
+                           regardless. ModeSwitch still runs and logs its
+                           events, but its output is not acted on.
   Arm 2 "protective"     : ModeSwitch routes to the scripted protective crouch
                            as soon as the fall trigger fires.
 
@@ -16,8 +15,7 @@ The impulse integral (N s) is logged alongside it.
 5 seeds per arm. Seeds vary the push direction slightly and the push timing, so
 the two arms see matched perturbations (seed i is identical across arms).
 
-The protective crouch is HAND-DESIGNED AND SCRIPTED, not learned. Whatever the
-numbers say is what gets reported -- including "it does not help".
+The protective crouch is hand-designed and scripted, not learned.
 """
 
 from __future__ import annotations

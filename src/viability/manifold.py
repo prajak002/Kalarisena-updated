@@ -1,13 +1,6 @@
-"""Successor-entry manifold Omega(g) (paper Sec 3.2, D_g / Omega definitions).
-
-Scope note: this repo has one trained skill so far (Stage A tracking on a
-single motion), so "the intended continuation g+" is instantiated here as
-"reach the final phase of this same motion safely" - not a distinct next
-skill, since no multi-skill Stage B-F training exists yet to condition on.
-This is a real, working, minimal instance of the paper's successor-entry
-concept, not the full cross-skill formulation - stated explicitly rather than
-implied.
-"""
+"""Successor-entry manifold Omega(g): "the intended continuation g+" is
+instantiated as "reach the final phase of this same motion safely", not a
+distinct next skill."""
 
 from __future__ import annotations
 

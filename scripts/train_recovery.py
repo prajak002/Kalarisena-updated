@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """Stage E: recovery-to-standing, via src/envs/recovery_env.py.
 
-The one stage in this ladder that couldn't reuse the tracking-episode
-structure every other stage does: there's no reference motion to recover
-into, so the environment starts from a randomized, physically-settled
-fallen pose and the policy has to reach and hold an upright stance with no
-tracking target at all.
-
 Usage
   python3 scripts/train_recovery.py --steps 2000000 --n-envs 8 --out logs/stageE_recovery
 """
@@ -92,12 +86,7 @@ def main() -> int:
     meta = {"experiment_name": "stageE_recovery", "stage": "E (recovery-to-standing)",
             "algo": "PPO (stable-baselines3)", "config": args.config,
             "steps": args.steps, "n_envs": args.n_envs, "device": args.device,
-            "note": ("starts from a randomized settled fallen pose, no reference "
-                     "motion; reward now includes dense upright/height shaping "
-                     "(configs/recovery.yaml) on top of the sparse "
-                     "recovery_success threshold - the previous run (0% success "
-                     "at 2M steps) had zero gradient below the 0.75 upright "
-                     "threshold")}
+            "note": "randomized fallen start, no reference motion; dense upright/height shaping in configs/recovery.yaml"}
     with open(os.path.join(args.out, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
 

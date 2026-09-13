@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
-"""Stage 3A: lateral push-recovery sweep in real MuJoCo contact dynamics.
+"""Stage 3A: lateral push-recovery sweep in MuJoCo contact dynamics.
 
-DEVIATION FROM THE ORIGINAL PLAN (stated up front, see DEMO_REPORT.md):
-The plan was to push during the single-support phase of single_leg_front_kick.
-That phase does not exist in this build: under joint-space PD tracking the robot
-cannot balance on one leg at all (scripts/sim_track_motion.py records the fall,
-and a 36-pose grid search over hip-roll / ankle-roll / waist-roll found no static
-single-leg posture that survives 2.5 s). The documented fallback is to run the
-sweep from a static stance instead. The deepest stance that IS stable is the
-Kalaripayattu horse stance (double support), so the sweep is run from there.
+Runs from the Kalaripayattu horse stance (double support) rather than a
+single-support pose: under joint-space PD tracking the robot cannot balance
+on one leg at all (scripts/sim_track_motion.py records the fall; a 36-pose
+grid search over hip-roll/ankle-roll/waist-roll found no static single-leg
+posture surviving 2.5s).
 
-Everything else is as specified: a lateral pelvis push via data.xfrc_applied for
-0.1 s, forces [0, 20, 40, 60, 80, 100] N, 3 trials each with the push timing
-jittered by +/-2 control frames, logging the CP-margin trace, switch events and
-whether the robot fell.
+Lateral pelvis push via data.xfrc_applied for 0.1s, forces
+[0, 20, 40, 60, 80, 100] N, 3 trials each with push timing jittered by
++/-2 control frames, logging the CP-margin trace, switch events, and
+fall/no-fall.
 """
 
 from __future__ import annotations

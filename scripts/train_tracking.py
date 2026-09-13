@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 """Stage A training: PPO tracking policy on one reference motion (paper 6.10).
 
-Implements the paper's Stage A with the honest, minimal scope stated in
-results_paper/PAPER_ASSETS.md: a single-motion residual tracking policy,
-trained with PPO in MuJoCo. Not ExBody-scale (that needs massively parallel
-GPU simulation); a genuine first rung that produces a real learned policy,
-real training curves, and a real evaluation per the section 7 protocol.
+Single-motion residual tracking policy, trained with PPO in MuJoCo. Not
+ExBody-scale (that needs massively parallel GPU simulation).
 
 Usage
   python3 scripts/train_tracking.py --npz data/motions_retargeted/kw_long_stance.npz \

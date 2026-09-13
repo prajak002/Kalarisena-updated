@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
-"""Train the Successor-Conditioned Viability Critic (paper Sec 3.2-3.3).
-
-Real, working, minimal instantiation - honestly scoped: this repo has one
-trained skill so far (Stage A tracking on a single motion), so the "intended
-continuation" is "reach the final phase of this motion safely", not a
-distinct next skill (no Stage B-F multi-skill training exists yet to
-condition on). Nothing here is a placeholder: every rollout is a real
-MuJoCo/PPO step, every label comes from a real simulated outcome, every
-metric is computed from real predictions on a real held-out split.
+"""Train the Successor-Conditioned Viability Critic. The "intended
+continuation" is instantiated as "reach the final phase of this motion
+safely", not a distinct next skill.
 
 Usage
   python3 scripts/train_viability_critic.py \

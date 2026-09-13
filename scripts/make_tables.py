@@ -8,15 +8,13 @@ Implements the draft's fixed reporting protocol:
     -> model_summary.json   (global summary, uniform over families)
     -> tables.tex           (LaTeX table bodies generated from the CSVs)
 
-HONESTY CONTRACT
-  * Every number is read from a real results CSV produced by an actual run
-    (results_sim/push_sweep.csv, fall_ab.csv, track_*.csv). Nothing is typed in.
-  * The controller behind these rows is the SCRIPTED PD + threshold switch
-    (model_name "scripted_pd_switch_v0"), not a trained policy. The paper's
-    Stage A-F policies do not exist yet; these tables are the protocol running
-    end-to-end on the scripted baseline, and must be labelled as such.
-  * Aggregation rule (stated per section 7.6): model level = uniform mean over
-    families.
+Notes
+  * Every number is read from a results CSV produced by an actual run
+    (results_sim/push_sweep.csv, fall_ab.csv, track_*.csv).
+  * This script only covers the scripted PD + threshold switch baseline
+    (model_name "scripted_pd_switch_v0"), not the trained Stage A-F policies
+    (see logs/ for those).
+  * Aggregation rule (section 7.6): model level = uniform mean over families.
 
 Usage:  python3 scripts/make_tables.py --results results_sim --out results_paper
 """

@@ -50,19 +50,10 @@ def _time_to_upright(step: int, lam: float = 0.01) -> float:
 
 
 def _upright_shaping(upright: float, W: float = 1.0) -> float:
-    """Dense signal proportional to torso-upright cosine (in [-1, 1]), so
-    the policy gets gradient everywhere instead of only past the
-    recovery_success threshold. Without this, recovery_success + a flat
-    per-step time penalty give zero learning signal to any pose that
-    hasn't already reached the upright threshold - which a randomly
-    fallen pose almost never does by chance."""
     return W * float(upright)
 
 
 def _height_shaping(base_height: float, target: float = 1.0, lam: float = 1.0) -> float:
-    """Dense signal rewarding torso height climbing back toward the
-    standing target, same shape as _com_support_margin/_capture_point_margin
-    (squared shortfall, zero once at or above target)."""
     return -lam * max(0.0, float(target) - float(base_height)) ** 2
 
 

@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Real MPJPE and Intent Preservation Rate (IPR) against the existing
-multi-motion tracker and residual policy - no new training, reuses
-logs/stageA_multi12 and logs/residual_multi12.
+"""MPJPE and Intent Preservation Rate (IPR) against the existing
+multi-motion tracker and residual policy - reuses logs/stageA_multi12 and
+logs/residual_multi12, no new training.
 
-MPJPE here is mean per-actuated-joint 3D body-frame position error (the
-child body of each actuated joint, via forward kinematics on both the
-rolled-out and the reference trajectory at matching frames) - a real,
-computed Cartesian error, not the joint-angle RMSE reported elsewhere.
+MPJPE here is mean per-actuated-joint 3D body-frame position error (via
+forward kinematics on both the rolled-out and reference trajectory at
+matching frames) - a Cartesian error, not the joint-angle RMSE reported
+elsewhere.
 
-IPR is defined here as: reaches the final reference frame without falling,
-under a lateral push perturbation - completion despite disturbance, which
-is what the paper's Intent Preservation Rate is measuring, computed against
-this repo's own narrower single-motion-per-episode scope rather than the
-paper's full multi-skill continuation definition.
+IPR: reaches the final reference frame without falling, under a lateral
+push perturbation.
 
 Usage
   python3 scripts/eval_protocol.py \
