@@ -25,7 +25,7 @@ from src.viability.features import eta
 from src.viability.perturbation import Perturbation, null_perturbation
 from src.viability.perturbed_env import PerturbedTrackEnv
 
-RESIDUAL_ACTION_SCALE = 0.4
+RESIDUAL_ACTION_SCALE = 0.15
 TAU_L = 0.25
 TAU_H = 0.70
 EMA_BETA = 0.90
@@ -53,25 +53,34 @@ class ViabilityGate:
         self.critic.eval()
         self.mean, self.std = ckpt["mean"], ckpt["std"]
         self.beta = beta
-        self.v_bar = 1.0
+        self.v_bar: float | None = None
 
     def reset(self) -> None:
-        self.v_bar = 1.0
+        # None (not 1.0): this critic's raw output is often 10+ orders of
+        # magnitude below 1.0 (see scripts/calibrate_residual_gate.py's
+        # per-motion output), so bootstrapping the EMA at a fixed prior of
+        # 1.0 meant v_bar took far longer to decay to the relevant scale
+        # than a typical (~40-step) episode lasts - the gate never opened
+        # at all. Seed with the first real reading instead.
+        self.v_bar = None
 
     def update(self, feat_vec: np.ndarray) -> tuple[float, float]:
         x = (feat_vec - self.mean) / self.std
         with torch.no_grad():
             v_raw = float(self.critic(torch.tensor(x, dtype=torch.float32).unsqueeze(0)).item())
-        self.v_bar = self.beta * self.v_bar + (1 - self.beta) * v_raw
+        self.v_bar = v_raw if self.v_bar is None else self.beta * self.v_bar + (1 - self.beta) * v_raw
         return v_raw, self.v_bar
 
 
 class IntentPreservingResidualEnv(PerturbedTrackEnv):
     def __init__(self, npz_path: str, tracker_policy, critic_path: str,
-                 seed: int | None = None, **kwargs):
+                 seed: int | None = None, tau_l: float = TAU_L, tau_h: float = TAU_H,
+                 force_gate: float | None = None, **kwargs):
         super().__init__(npz_path, seed=seed, **kwargs)
         self.tracker_policy = tracker_policy
         self.gate_fn = ViabilityGate(critic_path)
+        self.tau_l, self.tau_h = tau_l, tau_h
+        self.force_gate = force_gate
         base_dim = self.observation_space.shape[0]
         self.observation_space = spaces.Box(-np.inf, np.inf, (base_dim + 5,), np.float64)
         self.action_space = spaces.Box(-1.0, 1.0, (self.nu,), np.float32)
@@ -93,7 +102,7 @@ class IntentPreservingResidualEnv(PerturbedTrackEnv):
         phase = self._frame / max(self.n_frames - 1, 1)
         eta_vec = eta(info_prev, feats, phase, self.rt.base_height, (0.0, 0.0))
         v_raw, v_bar = self.gate_fn.update(eta_vec)
-        g = gate(v_bar)
+        g = gate(v_bar, self.tau_l, self.tau_h) if self.force_gate is None else self.force_gate
         return v_raw, v_bar, g, feats
 
     def step(self, delta_a):
@@ -116,7 +125,7 @@ class IntentPreservingResidualEnv(PerturbedTrackEnv):
         r_contact = float(contact_l or contact_r)
 
         cp_margin = float(feats_prev.get("cp_margin", -1.0))
-        r_balance = float(np.clip(cp_margin, 0.0, 0.3) / 0.3)
+        r_balance = -max(0.0, 0.05 - cp_margin) ** 2
 
         r_succ = float(truncated and not base_info["fell"])
         r_via = v_raw

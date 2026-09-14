@@ -1,0 +1,18 @@
+{
+  "experiment_name": "stageB_com",
+  "stage": "B (CoM/capture-point recoverability)",
+  "algo": "PPO (stable-baselines3)",
+  "config": "configs/com.yaml",
+  "seed": 45,
+  "motions": [
+    "data/motions_retargeted/kw_long_stance.npz",
+    "data/motions_retargeted/kw_long_stance_l.npz",
+    "data/motions_retargeted/kt_vadivu_lowseat.npz",
+    "data/motions_retargeted/kt_warrior_pose.npz",
+    "data/motions_retargeted/ky_warrior_lunge.npz",
+    "data/motions_retargeted/pk_warrior_oneleg.npz"
+  ],
+  "steps": 5000000,
+  "n_envs": 8,
+  "note": "trained from scratch; Stage A checkpoint has a different obs dim. Fixed two real bugs in the obs path: raw -999 sentinel values (com_margin/cp_margin when there's no foot contact) were being fed directly into the policy's observation uncapped, and cp_margin was duplicated in the obs vector instead of encoding support_mode."
+}

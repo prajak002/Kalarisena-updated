@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "nominal": "logs/stageA_multi12/tracking_multi_best.zip",
+    "fall": "logs/stageD_fall/fall_best.zip",
+    "recovery": "logs/stageE_recovery_v2/recovery_best.zip",
+    "motions": [
+      "data/motions_retargeted/kw_long_stance.npz",
+      "data/motions_retargeted/kt_vadivu_lowseat.npz",
+      "data/motions_retargeted/kt_warrior_pose.npz",
+      "data/motions_retargeted/ky_warrior_lunge.npz",
+      "data/motions_retargeted/kt_chuvadu_step.npz",
+      "data/motions_retargeted/kw_deep_reach.npz",
+      "data/motions_retargeted/ky_deep_lunge.npz",
+      "data/motions_retargeted/pk_stance_transitions.npz",
+      "data/motions_retargeted/ks_side_kick.npz",
+      "data/motions_retargeted/kw_highkick_right.npz",
+      "data/motions_retargeted/ky_kick_seq.npz",
+      "data/motions_retargeted/pk_kick_lunge.npz"
+    ],
+    "note": "RECOVERY mode routed through the real Stage E policy via _recovery_obs()/_recovery_step() when --recovery is given (action applied as an offset from the fixed default stance, scale 0.5, matching RecoveryEnv itself, with the reference frame frozen for the duration - NOT via KalariTrackEnv's residual-on-moving-reference step()); else falls back to the nominal tracker's action"
+  },
+  "overall": {
+    "switched": {
+      "fall_rate": 1.0,
+      "mean_episode_len": 20.77777777777778,
+      "mean_transitions": 1.1111111111111112
+    },
+    "nominal_only": {
+      "fall_rate": 0.9444444444444444,
+      "mean_episode_len": 38.111111111111114,
+      "mean_transitions": 0.0
+    }
+  },
+  "per_motion": {
+    "kw_long_stance": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 29.0,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 45.666666666666664,
+        "mean_transitions": 0.0
+      }
+    },
+    "kt_vadivu_lowseat": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 36.666666666666664,
+        "mean_transitions": 1.3333333333333333
+      },
+      "nominal_only": {
+        "fall_rate": 0.3333333333333333,
+        "mean_episode_len": 69.66666666666667,
+        "mean_transitions": 0.0
+      }
+    },
+    "kt_warrior_pose": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 19.666666666666668,
+        "mean_transitions": 1.6666666666666667
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 15.666666666666666,
+        "mean_transitions": 0.0
+      }
+    },
+    "ky_warrior_lunge": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 22.333333333333332,
+        "mean_transitions": 1.3333333333333333
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 15.0,
+        "mean_transitions": 0.0
+      }
+    },
+    "kt_chuvadu_step": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 11.333333333333334,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 19.0,
+        "mean_transitions": 0.0
+      }
+    },
+    "kw_deep_reach": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 26.0,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 54.333333333333336,
+        "mean_transitions": 0.0
+      }
+    },
+    "ky_deep_lunge": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 21.333333333333332,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 42.666666666666664,
+        "mean_transitions": 0.0
+      }
+    },
+    "pk_stance_transitions": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 12.666666666666666,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 49.666666666666664,
+        "mean_transitions": 0.0
+      }
+    },
+    "ks_side_kick": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 11.666666666666666,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 21.333333333333332,
+        "mean_transitions": 0.0
+      }
+    },
+    "kw_highkick_right": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 28.333333333333332,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 61.333333333333336,
+        "mean_transitions": 0.0
+      }
+    },
+    "ky_kick_seq": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 15.666666666666666,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 37.333333333333336,
+        "mean_transitions": 0.0
+      }
+    },
+    "pk_kick_lunge": {
+      "switched": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 14.666666666666666,
+        "mean_transitions": 1.0
+      },
+      "nominal_only": {
+        "fall_rate": 1.0,
+        "mean_episode_len": 25.666666666666668,
+        "mean_transitions": 0.0
+      }
+    }
+  }
+}

@@ -79,11 +79,13 @@ def evaluate(model, reward_cfg: dict, out_dir: str, n_episodes_per_motion: int =
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/com.yaml")
-    ap.add_argument("--steps", type=int, default=2_000_000)
+    ap.add_argument("--steps", type=int, default=5_000_000)
     ap.add_argument("--n-envs", type=int, default=8)
     ap.add_argument("--out", default="logs/stageB_com")
     ap.add_argument("--eval-only", action="store_true")
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--seed", type=int, default=45)
+    ap.add_argument("--device", default="cpu")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -96,7 +98,7 @@ def main() -> int:
     ckpt = os.path.join(args.out, "com_best.zip")
 
     if args.eval_only:
-        model = PPO.load(ckpt)
+        model = PPO.load(ckpt, device=args.device)
         summary = evaluate(model, reward_cfg, args.out)
         print(json.dumps(summary["overall"], indent=2))
         return 0
@@ -105,9 +107,13 @@ def main() -> int:
         args.steps, args.n_envs = 4096, 2
 
     meta = {"experiment_name": "stageB_com", "stage": "B (CoM/capture-point recoverability)",
-            "algo": "PPO (stable-baselines3)", "config": args.config,
+            "algo": "PPO (stable-baselines3)", "config": args.config, "seed": args.seed,
             "motions": STABLE_STANCE_MOTIONS, "steps": args.steps, "n_envs": args.n_envs,
-            "note": "trained from scratch; Stage A checkpoint has a different obs dim"}
+            "note": ("trained from scratch; Stage A checkpoint has a different obs dim. "
+                     "Fixed two real bugs in the obs path: raw -999 sentinel values "
+                     "(com_margin/cp_margin when there's no foot contact) were being fed "
+                     "directly into the policy's observation uncapped, and cp_margin was "
+                     "duplicated in the obs vector instead of encoding support_mode.")}
     with open(os.path.join(args.out, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
 
@@ -120,7 +126,7 @@ def main() -> int:
         gamma=0.99, gae_lambda=0.95, clip_range=0.2, ent_coef=0.003,
         policy_kwargs={"net_arch": [256, 256]},
         tensorboard_log=os.path.join(args.out, "tb"),
-        seed=45, device="auto",
+        seed=args.seed, device=args.device,
     )
     print(f"training {args.steps:,} steps on {args.n_envs} envs -> {args.out}")
     model.learn(total_timesteps=args.steps, progress_bar=False)

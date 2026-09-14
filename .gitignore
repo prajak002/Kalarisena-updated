@@ -12,6 +12,7 @@ __pycache__/
 # --- large generated data (GB-scale; regenerate, do not version) ---
 data/
 cloud_outputs/
+cloud_outputs_hf/
 outputs/
 models/
 results_review/

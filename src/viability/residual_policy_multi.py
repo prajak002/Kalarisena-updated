@@ -11,17 +11,28 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from src.viability.features import eta
 from src.viability.perturbed_multi_env import PerturbedMultiMotionTrackEnv
 from src.viability.residual_policy import (
-    RESIDUAL_ACTION_SCALE, W_BALANCE, W_CONTACT, W_DELTA, W_SKILL_DEV, W_SUCC, W_TRACK, W_VIA,
-    ViabilityGate, gate,
+    RESIDUAL_ACTION_SCALE, TAU_H, TAU_L, W_BALANCE, W_CONTACT, W_DELTA, W_SKILL_DEV, W_SUCC,
+    W_TRACK, W_VIA, ViabilityGate, gate,
 )
 
 
 class IntentPreservingResidualMultiEnv(PerturbedMultiMotionTrackEnv):
     def __init__(self, npz_paths: list[str], tracker_policy, critic_path: str,
-                 seed: int | None = None, **kwargs):
+                 seed: int | None = None, tau_l: float | list[float] = TAU_L,
+                 tau_h: float | list[float] = TAU_H,
+                 force_gate: float | None = None, **kwargs):
         super().__init__(npz_paths, seed=seed, **kwargs)
         self.tracker_policy = tracker_policy
         self.gate_fn = ViabilityGate(critic_path)
+        # Per-motion thresholds when a list is given (len == len(npz_paths)) -
+        # required in practice: the critic's raw output scale varies by up to
+        # 10 orders of magnitude across motions (see
+        # scripts/calibrate_residual_gate.py's per-motion output), so one
+        # global (tau_l, tau_h) pair pins the gate stuck open or closed for
+        # most motions rather than actually gating.
+        self.tau_l_by_motion = list(tau_l) if isinstance(tau_l, (list, tuple)) else [tau_l] * len(npz_paths)
+        self.tau_h_by_motion = list(tau_h) if isinstance(tau_h, (list, tuple)) else [tau_h] * len(npz_paths)
+        self.force_gate = force_gate
         base_dim = self.observation_space.shape[0]
         self.observation_space = spaces.Box(-np.inf, np.inf, (base_dim + 5,), np.float64)
         self.action_space = spaces.Box(-1.0, 1.0, (self.nu,), np.float32)
@@ -43,7 +54,9 @@ class IntentPreservingResidualMultiEnv(PerturbedMultiMotionTrackEnv):
         phase = self._frame / max(self.n_frames - 1, 1)
         eta_vec = eta(info_prev, feats, phase, self.rt.base_height, (0.0, 0.0))
         v_raw, v_bar = self.gate_fn.update(eta_vec)
-        g = gate(v_bar)
+        tau_l = self.tau_l_by_motion[self._active_motion_idx]
+        tau_h = self.tau_h_by_motion[self._active_motion_idx]
+        g = gate(v_bar, tau_l, tau_h) if self.force_gate is None else self.force_gate
         return v_raw, v_bar, g, feats
 
     def step(self, delta_a):
@@ -66,7 +79,7 @@ class IntentPreservingResidualMultiEnv(PerturbedMultiMotionTrackEnv):
         r_contact = float(contact_l or contact_r)
 
         cp_margin = float(feats_prev.get("cp_margin", -1.0))
-        r_balance = float(np.clip(cp_margin, 0.0, 0.3) / 0.3)
+        r_balance = -max(0.0, 0.05 - cp_margin) ** 2
 
         r_succ = float(truncated and not base_info["fell"])
         r_via = v_raw

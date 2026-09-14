@@ -1,0 +1,99 @@
+{
+  "tracker": "logs/stageA_multi12/tracking_multi_best.zip",
+  "critic": "logs/scvc_multi12/scvc_critic.pt",
+  "npz": [
+    "data/motions_retargeted/kw_long_stance.npz",
+    "data/motions_retargeted/kt_vadivu_lowseat.npz",
+    "data/motions_retargeted/kt_warrior_pose.npz",
+    "data/motions_retargeted/ky_warrior_lunge.npz",
+    "data/motions_retargeted/kt_chuvadu_step.npz",
+    "data/motions_retargeted/kw_deep_reach.npz",
+    "data/motions_retargeted/ky_deep_lunge.npz",
+    "data/motions_retargeted/pk_stance_transitions.npz",
+    "data/motions_retargeted/ks_side_kick.npz",
+    "data/motions_retargeted/kw_highkick_right.npz",
+    "data/motions_retargeted/ky_kick_seq.npz",
+    "data/motions_retargeted/pk_kick_lunge.npz"
+  ],
+  "per_motion_mean_v_raw": {
+    "kw_long_stance": {
+      "mean": 9.869077506551685e-07,
+      "tau_l": 1.4899754927264214e-19,
+      "tau_h": 3.763894662660522e-16
+    },
+    "kt_vadivu_lowseat": {
+      "mean": 7.850151727161702e-05,
+      "tau_l": 3.4917719826665916e-09,
+      "tau_h": 6.516899588859815e-07
+    },
+    "kt_warrior_pose": {
+      "mean": 2.0297459334249423e-07,
+      "tau_l": 2.570701084728816e-13,
+      "tau_h": 2.116064684587471e-10
+    },
+    "ky_warrior_lunge": {
+      "mean": 2.2964860416789648e-07,
+      "tau_l": 1.4225257779433368e-25,
+      "tau_h": 1.8446972660512984e-07
+    },
+    "kt_chuvadu_step": {
+      "mean": 2.6855291440370536e-09,
+      "tau_l": 1.1787584797140482e-10,
+      "tau_h": 9.947715984282013e-10
+    },
+    "kw_deep_reach": {
+      "mean": 7.549681091936323e-09,
+      "tau_l": 3.3610760743742413e-15,
+      "tau_h": 5.287463522574143e-11
+    },
+    "ky_deep_lunge": {
+      "mean": 7.595547083401876e-05,
+      "tau_l": 6.360975635111288e-11,
+      "tau_h": 2.592707604165412e-09
+    },
+    "pk_stance_transitions": {
+      "mean": 1.80196290513659e-08,
+      "tau_l": 3.530044747791371e-15,
+      "tau_h": 1.5954534915429974e-10
+    },
+    "ks_side_kick": {
+      "mean": 3.844115440188034e-06,
+      "tau_l": 2.142489302059403e-06,
+      "tau_h": 3.4713709055722548e-06
+    },
+    "kw_highkick_right": {
+      "mean": 2.726015082505937e-07,
+      "tau_l": 4.176437400939519e-15,
+      "tau_h": 1.745954075760281e-10
+    },
+    "ky_kick_seq": {
+      "mean": 1.229378035809904e-06,
+      "tau_l": 2.202347919782804e-15,
+      "tau_h": 5.4971348653620744e-12
+    },
+    "pk_kick_lunge": {
+      "mean": 1.1493373341928073e-14,
+      "tau_l": 1.044064791798082e-22,
+      "tau_h": 1.1442243829658222e-16
+    }
+  },
+  "n_episodes": 8,
+  "n_steps": 4104,
+  "mean": 1.6540716609331294e-05,
+  "std": 0.0001905124775615361,
+  "min": 0.0,
+  "max": 0.003952451515942812,
+  "percentiles": {
+    "5": 2.9264787752493404e-21,
+    "10": 1.0096655478738105e-18,
+    "20": 5.731137152988107e-16,
+    "30": 1.2951956232510036e-14,
+    "50": 6.787758289467094e-12,
+    "70": 1.6242056588566811e-09,
+    "80": 1.4578023233013937e-08,
+    "90": 4.119458481000038e-07,
+    "95": 4.964684649166884e-06
+  },
+  "suggested_tau_l": 5.731137152988107e-16,
+  "suggested_tau_h": 1.6242056588566811e-09
+}

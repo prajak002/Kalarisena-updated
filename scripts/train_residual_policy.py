@@ -26,19 +26,21 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-def make_env(npz_path: str, tracker_path: str, critic_path: str, rank: int):
+def make_env(npz_path: str, tracker_path: str, critic_path: str, rank: int,
+             tau_l: float, tau_h: float, seed_base: int = 2000):
     def _f():
         from stable_baselines3 import PPO
 
         from src.viability.residual_policy import IntentPreservingResidualEnv
 
         tracker = PPO.load(tracker_path, device="cpu")
-        return IntentPreservingResidualEnv(npz_path, tracker, critic_path, seed=2000 + rank)
+        return IntentPreservingResidualEnv(npz_path, tracker, critic_path, seed=seed_base + rank,
+                                            tau_l=tau_l, tau_h=tau_h)
     return _f
 
 
 def evaluate(model, npz_path: str, tracker_path: str, critic_path: str, out_dir: str,
-             n_episodes: int = 5, record_video: bool = True) -> dict:
+             tau_l: float, tau_h: float, n_episodes: int = 20, record_video: bool = True) -> dict:
     from stable_baselines3 import PPO
 
     from src.sim.rollout import write_video
@@ -51,7 +53,7 @@ def evaluate(model, npz_path: str, tracker_path: str, critic_path: str, out_dir:
     for arm in ("residual", "tracker_only"):
         for ep in range(n_episodes):
             env = IntentPreservingResidualEnv(
-                npz_path, tracker, critic_path, seed=6000 + ep,
+                npz_path, tracker, critic_path, seed=6000 + ep, tau_l=tau_l, tau_h=tau_h,
                 render_mode="rgb_array" if (record_video and ep == 0) else None)
             env.max_start = 0
             obs, info = env.reset(seed=6000 + ep)
@@ -109,6 +111,12 @@ def main() -> int:
     ap.add_argument("--out", default=None)
     ap.add_argument("--eval-only", action="store_true")
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--tau-l", type=float, required=True,
+                     help="from scripts/calibrate_residual_gate.py against --tracker/--critic")
+    ap.add_argument("--tau-h", type=float, required=True,
+                     help="from scripts/calibrate_residual_gate.py against --tracker/--critic")
+    ap.add_argument("--eval-episodes", type=int, default=20)
+    ap.add_argument("--seed", type=int, default=43)
     args = ap.parse_args()
 
     mid = os.path.basename(args.npz)[:-4]
@@ -116,13 +124,14 @@ def main() -> int:
     os.makedirs(out_dir, exist_ok=True)
 
     from stable_baselines3 import PPO
-    from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecMonitor
+    from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecMonitor, VecNormalize
 
     ckpt = os.path.join(out_dir, "residual_best.zip")
 
     if args.eval_only:
-        model = PPO.load(ckpt)
-        summary = evaluate(model, args.npz, args.tracker, args.critic, out_dir)
+        model = PPO.load(ckpt, device="cpu")
+        summary = evaluate(model, args.npz, args.tracker, args.critic, out_dir,
+                            args.tau_l, args.tau_h, n_episodes=args.eval_episodes)
         print(json.dumps(summary, indent=2))
         return 0
 
@@ -134,18 +143,24 @@ def main() -> int:
         "stage": "intent-preserving residual policy (paper Sec 3.3-3.4)",
         "algo": "PPO (stable-baselines3)",
         "tracker": args.tracker, "critic": args.critic, "npz": args.npz,
-        "steps": args.steps, "n_envs": args.n_envs,
-        "action": f"delta_a_t, authority-scaled and gated by g(V_bar_t)",
+        "steps": args.steps, "n_envs": args.n_envs, "seed": args.seed,
+        "tau_l": args.tau_l, "tau_h": args.tau_h,
+        "action": "delta_a_t, authority-scaled and gated by g(V_bar_t)",
         "obs": "base tracking obs (124d) + [V_raw, V_bar, gate, cp_margin, com_margin]",
-        "note": ("first trained instance of pi_theta; frozen tracker and frozen "
-                 "critic both narrow-scope (single motion) per their own training runs"),
+        "note": ("gate thresholds calibrated per tracker/critic pair rather than "
+                 "fixed constants; r_balance fixed to a squared-shortfall penalty "
+                 "(nonzero gradient below the safety margin, matching "
+                 "reward_builder._capture_point_margin's shape) instead of a "
+                 "reward clipped flat at zero there; RESIDUAL_ACTION_SCALE reduced "
+                 "0.4->0.15"),
     }
     with open(os.path.join(out_dir, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
 
     vec_cls = SubprocVecEnv if args.n_envs > 1 else DummyVecEnv
-    venv = VecMonitor(vec_cls([make_env(args.npz, args.tracker, args.critic, i)
+    venv = VecMonitor(vec_cls([make_env(args.npz, args.tracker, args.critic, i, args.tau_l, args.tau_h)
                                 for i in range(args.n_envs)]))
+    venv = VecNormalize(venv, norm_obs=False, norm_reward=True, clip_reward=10.0)
 
     model = PPO(
         "MlpPolicy", venv, verbose=1,
@@ -153,14 +168,16 @@ def main() -> int:
         gamma=0.99, gae_lambda=0.95, clip_range=0.2, ent_coef=0.003,
         policy_kwargs={"net_arch": [256, 256]},
         tensorboard_log=os.path.join(out_dir, "tb"),
-        seed=43, device="auto",
+        seed=args.seed, device="cpu",
     )
     print(f"training {args.steps:,} steps on {args.n_envs} envs -> {out_dir}")
     model.learn(total_timesteps=args.steps, progress_bar=False)
     model.save(ckpt)
+    venv.save(os.path.join(out_dir, "vecnormalize.pkl"))
     print(f"saved {ckpt}")
 
     summary = evaluate(model, args.npz, args.tracker, args.critic, out_dir,
+                        args.tau_l, args.tau_h, n_episodes=args.eval_episodes,
                         record_video=not args.smoke)
     with open(os.path.join(out_dir, "eval_summary.json"), "w") as fh:
         json.dump({"meta": meta, "summary": summary}, fh, indent=2)

@@ -15,8 +15,9 @@ Usage
   python3 scripts/eval_protocol.py \
       --tracker logs/stageA_multi12/tracking_multi_best.zip \
       --critic logs/scvc_multi12/scvc_critic.pt \
-      --residual logs/residual_multi12/residual_multi_best.zip \
-      --out logs/eval_protocol
+      --residual logs/residual_multi12_fixed/residual_multi_best.zip \
+      --gate-calibration logs/residual_multi12_fixed/gate_calibration_per_motion.json \
+      --out logs/eval_protocol_fixed
 """
 
 from __future__ import annotations
@@ -82,7 +83,8 @@ def _reference_full_qpos(env: PerturbedMultiMotionTrackEnv, frame: int) -> np.nd
     return qpos
 
 
-def run_rollout(env, tracker, residual, gate_fn, force: float, use_residual: bool, body_ids: list[int]):
+def run_rollout(env, tracker, residual, gate_fn, force: float, use_residual: bool, body_ids: list[int],
+                 tau_l: float, tau_h: float):
     pert = Perturbation(t_start=0.6, duration=0.1, force_x=0.0, force_y=force, obs_noise_std=0.0)
     env.set_perturbation(pert)
     obs, info = env.reset()
@@ -103,7 +105,7 @@ def run_rollout(env, tracker, residual, gate_fn, force: float, use_residual: boo
             phase = env._frame / max(env.n_frames - 1, 1)
             eta_vec = eta(info_prev, feats, phase, env.rt.base_height, (0.0, 0.0))
             _, v_bar = gate_fn.update(eta_vec)
-            g = gate(v_bar)
+            g = gate(v_bar, tau_l, tau_h)
             residual_obs = np.concatenate([obs, [0, 0, 0, 0, 0]])
             delta_a, _ = residual.predict(residual_obs, deterministic=True)
             action = a0 + g * RESIDUAL_ACTION_SCALE * np.asarray(delta_a, dtype=np.float64)
@@ -127,10 +129,19 @@ def main() -> int:
     ap.add_argument("--tracker", required=True)
     ap.add_argument("--critic", required=True)
     ap.add_argument("--residual", required=True)
+    ap.add_argument("--gate-calibration", required=True,
+                     help="scripts/calibrate_residual_gate.py --out JSON covering every "
+                          "motion in MOTION_SET - a single global tau_l/tau_h does not "
+                          "work, the critic's raw output scale varies by orders of "
+                          "magnitude across motions")
     ap.add_argument("--out", default="logs/eval_protocol")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
+    with open(args.gate_calibration) as fh:
+        calib = json.load(fh)
+    tau_map = {mid: (v["tau_l"], v["tau_h"]) for mid, v in calib["per_motion_mean_v_raw"].items()}
+
     from stable_baselines3 import PPO
     from src.viability.residual_policy import ViabilityGate
 
@@ -140,6 +151,7 @@ def main() -> int:
     results = {"tracker_only": [], "residual_gated": []}
     for npz in MOTION_SET:
         mid = os.path.basename(npz)[:-4]
+        tau_l, tau_h = tau_map[mid]
         env = PerturbedMultiMotionTrackEnv([npz], seed=15000)
         env.max_start = 0
         body_ids = _joint_body_ids(env)
@@ -147,7 +159,8 @@ def main() -> int:
             for arm in ("tracker_only", "residual_gated"):
                 gate_fn = ViabilityGate(args.critic) if arm == "residual_gated" else None
                 row = run_rollout(env, tracker, residual, gate_fn, force,
-                                   use_residual=(arm == "residual_gated"), body_ids=body_ids)
+                                   use_residual=(arm == "residual_gated"), body_ids=body_ids,
+                                   tau_l=tau_l, tau_h=tau_h)
                 row.update({"motion_id": mid, "push_force": force})
                 results[arm].append(row)
         env.close()

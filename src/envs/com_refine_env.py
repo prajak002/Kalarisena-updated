@@ -38,12 +38,25 @@ class ComRefineEnv(MultiMotionTrackEnv):
         right_h = min(heights[g] for g in rt.right_foot_geoms)
         return left_h < z_thresh, right_h < z_thresh
 
+    _SUPPORT_MODE_CODE = {"double": 1.0, "single_left": 0.5, "single_right": -0.5, "no_contact": 0.0}
+
     def _augmented_obs(self, base_obs: np.ndarray, feats: dict) -> np.ndarray:
+        has_support = feats["support_area"] > 0
+        # get_support_features returns -999.0 sentinels for com_margin/cp_margin
+        # when there's no contact (src/dynamics/pinocchio_wrapper.py) - the
+        # reward path already guards against feeding that into training
+        # (com_refine_env.step's `if has_support else 0.0`), but this
+        # observation path didn't: the policy was seeing a raw -999 in its
+        # input whenever contact was briefly lost, exactly when it most needs
+        # a clean signal rather than an extreme out-of-distribution spike.
+        com_margin = feats["com_margin"] if has_support else 0.0
+        cp_margin = feats["cp_margin"] if has_support else 0.0
         support_center = feats["support_center"]
         support_center = np.nan_to_num(support_center, nan=0.0)
+        mode_code = self._SUPPORT_MODE_CODE.get(feats.get("support_mode"), 0.0)
         extra = np.array([
-            feats["com_margin"], feats["cp_margin"], feats["support_area"],
-            *support_center, feats["cp_margin"],
+            com_margin, cp_margin, feats["support_area"],
+            *support_center, mode_code,
         ], dtype=np.float64)
         return np.concatenate([base_obs, extra])
 

@@ -62,6 +62,7 @@ def main() -> int:
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--eval-episodes", type=int, default=20)
     ap.add_argument("--device", default="cpu")
+    ap.add_argument("--seed", type=int, default=49)
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -85,7 +86,7 @@ def main() -> int:
 
     meta = {"experiment_name": "stageE_recovery", "stage": "E (recovery-to-standing)",
             "algo": "PPO (stable-baselines3)", "config": args.config,
-            "steps": args.steps, "n_envs": args.n_envs, "device": args.device,
+            "steps": args.steps, "n_envs": args.n_envs, "device": args.device, "seed": args.seed,
             "note": "randomized fallen start, no reference motion; dense upright/height shaping in configs/recovery.yaml"}
     with open(os.path.join(args.out, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
@@ -100,7 +101,7 @@ def main() -> int:
         gamma=0.99, gae_lambda=0.95, clip_range=0.2, ent_coef=0.003,
         policy_kwargs={"net_arch": [256, 256]},
         tensorboard_log=os.path.join(args.out, "tb"),
-        seed=49, device=args.device,
+        seed=args.seed, device=args.device,
     )
     print(f"training {args.steps:,} steps on {args.n_envs} envs -> {args.out}")
     model.learn(total_timesteps=args.steps, progress_bar=False)

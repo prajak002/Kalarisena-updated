@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """Stage F: integrates trained policies with the existing ModeSwitch
 (src/switch/mode_switch.py) - real threshold-based switching between a
-nominal tracker and a fall policy, per train_switch.py's own docstring
-("Start with threshold-based switching... not learned switch").
+nominal tracker, a fall policy, and (when --recovery is given) the real
+Stage E recovery policy, per train_switch.py's own docstring ("Start with
+threshold-based switching... not learned switch").
 
-No separate learned recovery policy exists (Stage E), so RECOVERY mode
-falls back to the nominal tracker's own action - the same honest
-simplification already used elsewhere in this repo for a_t^safe.
+RecoveryEnv (src/envs/recovery_env.py) has its own observation space (no
+reference motion, so it can't consume the tracker's 124-d obs) - when
+--recovery is given, its exact observation is reconstructed here from the
+shared MuJoCo state instead of falling back to the nominal tracker's
+action for RECOVERY mode.
 
 Usage
   python3 scripts/eval_integrated_switch.py \
       --nominal logs/stageA_multi12/tracking_multi_best.zip \
       --fall logs/stageD_fall/fall_best.zip \
+      --recovery logs/stageE_recovery_v2/recovery_best.zip \
       --out logs/stageF_switch
 """
 
@@ -27,8 +31,12 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.dynamics.pinocchio_wrapper import PinocchioWrapper
+from src.envs.kalari_track_env import FALL_DUP, FALL_DZ
 from src.envs.multi_motion_env import MultiMotionTrackEnv
+from src.sim.conventions import quat_wxyz_to_matrix
 from src.switch.mode_switch import Mode, ModeSwitch, SwitchConfig
+
+RECOVERY_ACTION_SCALE = 0.5  # matches src/envs/recovery_env.py's own ACTION_SCALE
 
 URDF = "assets/unitree_g1/g1_29dof_rev_1_0.urdf"
 
@@ -73,7 +81,47 @@ def _torso_force(env: MultiMotionTrackEnv) -> float:
     return env.rt.geom_group_force(torso_geoms)
 
 
-def run_episode(env, pin, nominal, fall, switch: ModeSwitch, use_switch: bool):
+def _recovery_obs(env: MultiMotionTrackEnv) -> np.ndarray:
+    """Exact reconstruction of RecoveryEnv._obs() (src/envs/recovery_env.py)
+    from the shared MuJoCo state, since RecoveryEnv itself has no reference
+    motion and can't be instantiated here."""
+    d = env.rt.data
+    q = d.qpos[env.rt.act_qadr]
+    dq = d.qvel[env.rt.act_vadr] * 0.1
+    rot = quat_wxyz_to_matrix(d.qpos[3:7])
+    gravity_b = rot.T @ np.array([0.0, 0.0, -1.0])
+    angvel_b = d.qvel[3:6] * 0.2
+    upright = np.array([env.rt.torso_upright_cos()])
+    return np.concatenate([q, dq, gravity_b, angvel_b, upright])
+
+
+def _recovery_step(env: MultiMotionTrackEnv, action: np.ndarray) -> tuple[np.ndarray, bool, bool, dict]:
+    """Applies the recovery policy's action the way RecoveryEnv itself does -
+    an offset from the fixed default standing pose at scale 0.5 - instead of
+    routing it through KalariTrackEnv.step()'s residual-on-moving-reference
+    formula (q_cmd = ref_joints(frame) + 0.25*action). The two envs' actions
+    are not interchangeable: feeding a RecoveryEnv-trained action into
+    env.step() silently reinterprets it as a small offset from the current
+    Kalaripayattu reference pose, which produced a 100% fall rate that was a
+    plumbing bug, not a real result. Also freezes env._frame for the
+    duration of RECOVERY mode (rather than letting KalariTrackEnv.step()
+    advance it) so the reference motion resumes from where it left off once
+    NOMINAL mode takes back over, instead of having skipped ahead while the
+    robot was busy recovering."""
+    action = np.clip(np.asarray(action, dtype=np.float64), -1.0, 1.0)
+    q_cmd = np.clip(env.rt.default_joint_targets() + RECOVERY_ACTION_SCALE * action,
+                     env.jnt_lo, env.jnt_hi)
+    env.rt.control_step(q_cmd)
+
+    k = min(env._frame, env.n_frames - 1)
+    z = env.rt.base_height
+    upright = env.rt.torso_upright_cos()
+    fell = bool(z < env.ref_z[k] - FALL_DZ or upright < env.ref_up[k] - FALL_DUP)
+    truncated = bool(env._frame >= env.n_frames - 1)
+    return env._obs(), fell, truncated, {"fell": fell, "upright": upright}
+
+
+def run_episode(env, pin, nominal, fall, recovery, switch: ModeSwitch, use_switch: bool):
     obs, info = env.reset()
     switch.reset()
     done = trunc = False
@@ -85,13 +133,18 @@ def run_episode(env, pin, nominal, fall, switch: ModeSwitch, use_switch: bool):
         mode = switch.step(feats) if use_switch else Mode.NOMINAL
         mode_counts[mode.value] += 1
 
-        if mode == Mode.FALL and fall is not None:
-            fall_obs = np.concatenate([obs, [_torso_force(env), 0.0]])
-            action, _ = fall.predict(fall_obs, deterministic=True)
+        if mode == Mode.RECOVERY and recovery is not None:
+            action, _ = recovery.predict(_recovery_obs(env), deterministic=True)
+            obs, fell, trunc, si = _recovery_step(env, action)
+            done = fell
         else:
-            action, _ = nominal.predict(obs, deterministic=True)
+            if mode == Mode.FALL and fall is not None:
+                fall_obs = np.concatenate([obs, [_torso_force(env), 0.0]])
+                action, _ = fall.predict(fall_obs, deterministic=True)
+            else:
+                action, _ = nominal.predict(obs, deterministic=True)
+            obs, r, done, trunc, si = env.step(action)
 
-        obs, r, done, trunc, si = env.step(action)
         fell_ever = fell_ever or si["fell"]
         step += 1
     return {"episode_len": step, "fell": int(fell_ever), "mode_counts": mode_counts,
@@ -102,6 +155,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--nominal", required=True)
     ap.add_argument("--fall", default=None)
+    ap.add_argument("--recovery", default=None)
     ap.add_argument("--out", default="logs/stageF_switch")
     ap.add_argument("--episodes-per-motion", type=int, default=3)
     args = ap.parse_args()
@@ -111,6 +165,7 @@ def main() -> int:
 
     nominal = PPO.load(args.nominal, device="cpu")
     fall = PPO.load(args.fall, device="cpu") if args.fall else None
+    recovery = PPO.load(args.recovery, device="cpu") if args.recovery else None
     pin = PinocchioWrapper(URDF)
     switch_cfg = SwitchConfig(delta1=0.05, delta2=15.0, delta3=0.20, min_dwell_steps=30)
 
@@ -124,7 +179,7 @@ def main() -> int:
         for arm, use_switch in (("switched", True), ("nominal_only", False)):
             for ep in range(args.episodes_per_motion):
                 switch = ModeSwitch(switch_cfg)
-                row = run_episode(env, pin, nominal, fall, switch, use_switch)
+                row = run_episode(env, pin, nominal, fall, recovery, switch, use_switch)
                 rows[arm].append(row)
                 results[arm].append(row)
         env.close()
@@ -140,8 +195,15 @@ def main() -> int:
                       "mean_transitions": float(np.mean([r["transitions"] for r in results[arm]]))}
                for arm in ("switched", "nominal_only")}
 
-    summary = {"meta": {"nominal": args.nominal, "fall": args.fall, "motions": MOTION_SET,
-                         "note": "RECOVERY mode falls back to the nominal tracker; no Stage E policy exists"},
+    summary = {"meta": {"nominal": args.nominal, "fall": args.fall, "recovery": args.recovery,
+                         "motions": MOTION_SET,
+                         "note": ("RECOVERY mode routed through the real Stage E policy via "
+                                  "_recovery_obs()/_recovery_step() when --recovery is given "
+                                  "(action applied as an offset from the fixed default stance, "
+                                  "scale 0.5, matching RecoveryEnv itself, with the reference "
+                                  "frame frozen for the duration - NOT via KalariTrackEnv's "
+                                  "residual-on-moving-reference step()); else falls back to "
+                                  "the nominal tracker's action")},
                "overall": overall, "per_motion": per_motion}
     with open(os.path.join(args.out, "eval_summary.json"), "w") as fh:
         json.dump(summary, fh, indent=2)

@@ -133,6 +133,7 @@ def main() -> int:
     ap.add_argument("--eval-only", action="store_true")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--device", default="cpu")
+    ap.add_argument("--seed", type=int, default=44)
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -160,6 +161,7 @@ def main() -> int:
         "action": "joint target residuals, s_a=0.25 rad",
         "obs": "proprioception + reference + phase (124d)",
         "note": "full 56-motion train split; held-out eval on val+test (14 motions)",
+        "seed": args.seed,
     }
     with open(os.path.join(args.out, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
@@ -173,7 +175,7 @@ def main() -> int:
         gamma=0.99, gae_lambda=0.95, clip_range=0.2, ent_coef=0.003,
         policy_kwargs={"net_arch": [256, 256]},
         tensorboard_log=os.path.join(args.out, "tb"),
-        seed=44, device=args.device,
+        seed=args.seed, device=args.device,
     )
     print(f"training {args.steps:,} steps on {args.n_envs} envs, "
           f"{len(TRAIN_SET)} train motions ({len(HELDOUT_SET)} held out) -> {args.out}")

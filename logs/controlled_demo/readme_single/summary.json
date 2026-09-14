@@ -1,0 +1,23 @@
+{
+  "nominal": "logs/stageA_multi12/tracking_multi_best.zip",
+  "fall": null,
+  "recovery": null,
+  "npz": "data/motions_retargeted/kw_long_stance.npz",
+  "pushes": [
+    [
+      0.5,
+      90.0,
+      60.0,
+      0.1
+    ]
+  ],
+  "switching_enabled": false,
+  "result": {
+    "fell": 1,
+    "steps": 48,
+    "mode_counts": {
+      "nominal": 48
+    },
+    "transitions": []
+  }
+}

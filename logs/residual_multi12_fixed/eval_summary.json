@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "experiment_name": "residual_multi12",
+    "stage": "intent-preserving residual policy, multi-motion",
+    "algo": "PPO (stable-baselines3)",
+    "tracker": "logs/stageA_multi12/tracking_multi_best.zip",
+    "critic": "logs/scvc_multi12/scvc_critic.pt",
+    "motions": [
+      "data/motions_retargeted/kw_long_stance.npz",
+      "data/motions_retargeted/kt_vadivu_lowseat.npz",
+      "data/motions_retargeted/kt_warrior_pose.npz",
+      "data/motions_retargeted/ky_warrior_lunge.npz",
+      "data/motions_retargeted/kt_chuvadu_step.npz",
+      "data/motions_retargeted/kw_deep_reach.npz",
+      "data/motions_retargeted/ky_deep_lunge.npz",
+      "data/motions_retargeted/pk_stance_transitions.npz",
+      "data/motions_retargeted/ks_side_kick.npz",
+      "data/motions_retargeted/kw_highkick_right.npz",
+      "data/motions_retargeted/ky_kick_seq.npz",
+      "data/motions_retargeted/pk_kick_lunge.npz"
+    ],
+    "steps": 2000000,
+    "n_envs": 8,
+    "gate_calibration": "logs/gate_calibration_multi12.json",
+    "tau_map": {
+      "kw_long_stance": [
+        1.4899754927264214e-19,
+        3.763894662660522e-16
+      ],
+      "kt_vadivu_lowseat": [
+        3.4917719826665916e-09,
+        6.516899588859815e-07
+      ],
+      "kt_warrior_pose": [
+        2.570701084728816e-13,
+        2.116064684587471e-10
+      ],
+      "ky_warrior_lunge": [
+        1.4225257779433368e-25,
+        1.8446972660512984e-07
+      ],
+      "kt_chuvadu_step": [
+        1.1787584797140482e-10,
+        9.947715984282013e-10
+      ],
+      "kw_deep_reach": [
+        3.3610760743742413e-15,
+        5.287463522574143e-11
+      ],
+      "ky_deep_lunge": [
+        6.360975635111288e-11,
+        2.592707604165412e-09
+      ],
+      "pk_stance_transitions": [
+        3.530044747791371e-15,
+        1.5954534915429974e-10
+      ],
+      "ks_side_kick": [
+        2.142489302059403e-06,
+        3.4713709055722548e-06
+      ],
+      "kw_highkick_right": [
+        4.176437400939519e-15,
+        1.745954075760281e-10
+      ],
+      "ky_kick_seq": [
+        2.202347919782804e-15,
+        5.4971348653620744e-12
+      ],
+      "pk_kick_lunge": [
+        1.044064791798082e-22,
+        1.1442243829658222e-16
+      ]
+    },
+    "seed": 47,
+    "force_gate": null,
+    "note": "gate thresholds calibrated per tracker/critic pair via scripts/calibrate_residual_gate.py rather than fixed constants; r_balance uses a squared-shortfall penalty (gradient below the safety margin) instead of a reward clipped to zero there; RESIDUAL_ACTION_SCALE reduced from 0.4 to 0.15"
+  },
+  "summary": {
+    "overall": {
+      "residual": {
+        "fall_rate": 0.9583333333333334,
+        "mean_episode_len": 39.125,
+        "mean_gate": 0.35088237441335063
+      },
+      "tracker_only": {
+        "fall_rate": 0.9583333333333334,
+        "mean_episode_len": 39.925,
+        "mean_gate": 0.34988534496428186
+      }
+    },
+    "per_motion": {
+      "kw_long_stance": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 52.7,
+          "mean_gate": 0.04397496758226101
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 58.2,
+          "mean_gate": 0.035578648814562006
+        }
+      },
+      "kt_vadivu_lowseat": {
+        "residual": {
+          "fall_rate": 0.5,
+          "mean_episode_len": 71.4,
+          "mean_gate": 0.16852750036803485
+        },
+        "tracker_only": {
+          "fall_rate": 0.5,
+          "mean_episode_len": 71.6,
+          "mean_gate": 0.17186128197361908
+        }
+      },
+      "kt_warrior_pose": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 19.6,
+          "mean_gate": 0.5263318262362431
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 19.7,
+          "mean_gate": 0.5165933276893808
+        }
+      },
+      "ky_warrior_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 20.7,
+          "mean_gate": 0.49985480721884246
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 21.0,
+          "mean_gate": 0.5162246816334176
+        }
+      },
+      "kt_chuvadu_step": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 27.2,
+          "mean_gate": 0.5680341227349496
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 27.6,
+          "mean_gate": 0.5761442709160403
+        }
+      },
+      "kw_deep_reach": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 60.1,
+          "mean_gate": 0.6541220045222599
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 60.9,
+          "mean_gate": 0.656171019600358
+        }
+      },
+      "ky_deep_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 31.7,
+          "mean_gate": 0.18575546766966045
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 34.3,
+          "mean_gate": 0.1285268264275524
+        }
+      },
+      "pk_stance_transitions": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 47.5,
+          "mean_gate": 0.16640397892230213
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 48.0,
+          "mean_gate": 0.16801001749146188
+        }
+      },
+      "ks_side_kick": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 18.5,
+          "mean_gate": 0.8963672597051755
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 18.9,
+          "mean_gate": 0.9011115591731395
+        }
+      },
+      "kw_highkick_right": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 51.6,
+          "mean_gate": 0.23078323715897464
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 51.0,
+          "mean_gate": 0.25397117676032144
+        }
+      },
+      "ky_kick_seq": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 40.1,
+          "mean_gate": 0.17043332084150403
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 39.5,
+          "mean_gate": 0.17443132909152936
+        }
+      },
+      "pk_kick_lunge": {
+        "residual": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 28.4,
+          "mean_gate": 0.1
+        },
+        "tracker_only": {
+          "fall_rate": 1.0,
+          "mean_episode_len": 28.4,
+          "mean_gate": 0.1
+        }
+      }
+    }
+  }
+}
